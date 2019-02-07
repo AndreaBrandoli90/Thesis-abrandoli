@@ -1,2 +1,200 @@
-\chapter{Cryptographic Background}
-\label{chpr:crypto}
+\chapter{Distributed Consensus}
+\label{chpr:consensus}
+
+\bigskip
+\section{Distributed systems}
+With the persistent expansion of technology in the digital age we are going through, distributed systems are becoming more and more widespread.
+
+\bigskip
+\noindent
+On one side big companies operate on a global scale with thousands of machines deployed all over the world, big data are stored in various data centers and computational power is shared on multicore processors or computing clusters.
+
+\bigskip
+\noindent
+On the other side, every day each of us operates with a distributed system; just think about a modern smartphone: it can share multiple data on the cloud and can contain multiple processing devices. Otherwise withdrawing money at the ATM is a perfect example of usage of a distributed system.
+
+\bigskip
+\noindent
+There is no a unique formal definition of distributed system. The one that fits better our interest is:
+\begin{mydef} {\bf (distributed system)\footnote{\url{https://en.wikipedia.org/wiki/Distributed_computing}}}.
+    A distributed system is a system whose components are located on different networked computers, which communicate and coordinate their actions by passing messages to one another. The components interact with one another in order to achieve a common goal. Three significant characteristics of distributed systems are: concurrency of components, lack of a global clock, and independent failure of components.
+\end{mydef}
+
+\bigskip
+\noindent
+Therefore the main reasons for using distributed systems are:
+\begin{itemize}
+    \item Scalability: Distributed systems should be scalable with respect to geography, administration or size.
+    \item Performance: Compared to other models, distributed models are expected to give a much-wanted boost to performance.
+    \item Fault Tolerance: A cluster of multiple machines is inherently more fault-tolerant than a single one.
+    \item Reliability: Data is replicated on different machines in order to prevent loss.
+    \item Availability: Data is replicated on different machines to minimize latency and grant fast access.
+\end{itemize}
+
+\bigskip
+\noindent
+However, beautiful features like these often have a downside, bringing to light some challenging problems:
+\begin{itemize}
+    \item Security: Especially when using public networks.
+    \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or Blockchain.}: In public distributed systems coordination problems are prevalent if proper protocols or policies are not in place; agents could be malevolent or malicious.
+\end{itemize}
+
+\bigskip
+\section{Consensus}
+(reworka tutto) \\
+As we learned before, one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, and atomic broadcasts. The real world applications include clock synchronization, PageRank, opinion formation, smart power grids, state estimation, control of UAVs (and multiple robots/agents in general), load balancing and others. Let us get in formal definitions:
+\begin{mydef} {\bf (node)}.
+    We call a single actor in the system node. In a computer network the computers are the nodes, in the classical client-server model both the server and the client are nodes, and so on.
+\end{mydef}
+\begin{mydef} {\bf (consensus)}.\label{def:consensus}
+    There are $n$ nodes, of which at most $f$ might crash, i.e., at least $n-f$ nodes are correct. Node $i$ starts with an input value $v_{i}$. The nodes must decide for one of those values, satisfying the following properties:
+    \begin{itemize}
+        \item Agreement: All correct noes decide for the same value.
+        \item Termination: All correct nodes terminate in finite time.
+        \item Validity: The decision value must be the input value of a node.
+    \end{itemize}
+\end{mydef}
+
+\bigskip
+\subsection{Two friends}
+Nota: preso da wattenhoefer.\\
+Alice wants to arrange dinner with Bob, and since both of them are very reluctant to use the \enquote{call} functionality of their phones, she sends a text message suggesting to meet for dinner at 6pm. However, texting is unreliable, and Alice cannot be sure that the message arrives at Bob's phone, hence she will only go to the meeting point if she receives a confirmation message from Bob. But Bob cannot be sure that his confirmation message is received; if the confirmation is lost, Alice cannot determine if Bob did not even receive her suggestion, or if Bob's confirmation was lost. Therefore, Bob demands a confirmation message from Alice, to be sure that she will be there. But as this message can also be lost...
+
+\bigskip
+\noindent
+You can see that such a message exchange continues forever, if both Alice and Bob want to be sure that the other person will come to the meeting point!
+
+\bigskip
+\subsection{Byzantine Agreement}
+It could happen that nodes in a distributed system do not just crash, instead they could behave arbitrarily or be voluntarily malevolent.
+\begin{mydef} {\bf (byzantine node)\footnote{Before the term \textit{byzantine} was coined, the terms Albanian Generals or Chinese Generals were used in order to describe malicious behavior. When the involved researchers met people from these countries they moved, for obvious reasons, to the historic term byzantine.}}.
+    A node which can have arbitrary behaviour is called byzantine. This includes \enquote{anything imaginable}, e.g., not sending any massage at all, or sending different and wrong messages to different neighbors, or lying about the input value.
+\end{mydef}
+\noindent
+Thus, achieving consensus (as in Definition \ref{def:consensus}) in a system with byzantine nodes is much more harder. A careful reader immediately realizes that fulfilling agreement and termination is straight-forward, but what about validity? Reminding that a byzantine node can be malevolent lying about its input value, we must specify different types of validity:
+\begin{mydef}{\bf (any-input validity)\footnote{This is the validity definition we implicitly used for consensus, in Definition \ref{def:consensus}}}.
+    The decision value must be the input value of any node.
+\end{mydef}
+\noindent
+As we can see, this definition does not still make sense in presence of byzantine nodes; we would wish for a differentiation between byzantine and correct inputs.
+\begin{mydef}{\bf (correct-input validity)}.
+    The decision value must be the input value of a correct node.
+\end{mydef}
+\noindent
+Achieving this particular validity definition is not so simple, as byzantine nodes following correctly a specified protocol but lying about theirs input values are indistinguishable from correct nodes. An alternative could be:
+\begin{mydef}{\bf (all-same validity)}.
+    If all correct nodes start with the same input $v$, the decision value must be $v$.
+\end{mydef}
+\noindent
+Here, if the decision values are binary, then correct-input validity is induced by all-same validity. Else, if the input values are not binary, all-same validity is not useful anymore.
+
+\bigskip
+\noindent
+Now that we have clear in mind what are the ingredients for the consensus recipe, a question bales to us: which are the algorithms that solve byzantine agreement? What type of validity they fulfill? The King algorithm is one of the best examples, but we have to restrict ourselves to the so-called synchronous model.
+\begin{mydef}{\bf (synchronous model)}.
+    In the synchronous model, nodes operate in synchronous rounds. In each round, each node may send a message to the other nodes, receive the message sent by the other nodes, and do some local computation.
+\end{mydef}
+
+\begin{algorithm}
+	\caption{King Algorithm (for $f<n/3$)}
+	\label{alg:king}
+	\begin{algorithmic}[1]
+		\State $x =$ my input value
+		\For {phase $= 1$ to $f+1$}
+		\Statex \ \ \ \ \textit{Round 1}
+		\State Broadcast $value(x)$
+		\Statex \ \ \ \ \textit{Round 2}
+		\If {some $value(y)$ at least $n-f$ times}
+		\State Broadcast $propose(y)$
+		\EndIf 
+		\If {some $propose(z)$ received more than $f$ times}
+		\State $x=z$
+		\EndIf
+		\Statex \ \ \ \ \textit{Round 3}
+		\State Let node $v_{i}$ be the predefined king of this phase $i$
+		\State The king $v_{i}$ broadcasts its current value $w$
+		\If {received strictly less than $n-f$ $propose(x)$}
+		\State $x=w$
+		\EndIf
+		\EndFor
+	\end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\bigskip
+\noindent
+To be rigorous, we must state some useful lemmas in order to prove that Algorithm \ref{alg:king} solves byzantine agreement.
+\begin{mylemma}
+    \label{lemma:1}
+    Algorithm \ref{alg:king} fulfills the all-same validity.
+\end{mylemma}
+\begin{mylemma}
+    \label{lemma:2}
+    There is at least one phase with a correct king.
+\end{mylemma}
+\begin{mylemma}
+    \label{lemma:3}
+    After a round with a correct king, the correct nodes will not change their values $v$ anymore, if $n > 3f$.
+\end{mylemma}
+
+\begin{thm}
+    Algorithm \ref{alg:king} solves byzantine agreement.
+\end{thm}
+\begin{proof}
+    The king algorithm reaches agreement as either all correct nodes start with the same value, or they agree on the same value latest after the phase where a correct node was king according to Lemmas \ref{lemma:2} and \ref{lemma:3}. Because of Lemma \ref{lemma:1} we know that they will stick with this value. Termination is guaranteed after $3(f+1)$ rounds, and all-same validity is proved in Lemma \ref{lemma:1}.
+\end{proof}
+
+\bigskip
+\noindent
+However, this is not the end of the story about distributed consensus. In order to dig into the hearth of this work we must introduce consensus results in asynchronous networks, in presence of byzantine nodes.
+\begin{mydef}{\bf (asynchronous model)}.
+    In the asynchronus model, algorithms are event based (\enquote{upon receiving message ..., do ...}). Nodes do not have access to a synchronized wall-clock. A message sent from one node to another will arrive in a finite but unbounded time.
+\end{mydef}
+\begin{mydef}{\bf (asynchronous runtime)}.
+    For algorithms in the asynchronous model, the runtime is the number of time units from the start of the execution to its completion in the worst case (every legal input, every execution scenario), assuming that each message has a delay of at most one time unit.    
+\end{mydef}
+
+\bigskip
+\noindent
+A famous algorithm by Ben-Or (more details in \cite{Ben-Or:1983:AFC:800221.806707}) tries to solve asynchronous byzantine agreement.
+
+\bigskip
+\begin{algorithm}
+	\caption{Asynchronous Byzantine Agreement (Ben-Or, for $f < n/9$)}
+	\label{alg:ben-or}
+	\begin{algorithmic}[1]
+		\State $x_{i} \in \{0,1\}$ \Comment{input bit}
+		\State $r=1$ \Comment{round}
+		\State decided = false
+		\State Broadcast $propose(x_{i},r)$
+		\Repeat
+		\State Wait until $n-f$ $propose$ messages of current round $r$ arrived
+		\If{at least $n-2f$ $propose$ messages contain the same value $x$}
+		\State $x_{i}=x$, decided = true
+		\ElsIf{at least $n-4f$ $propose$ messages contain the same value $x$}
+		\State $x_{i}=x$
+		\Else
+		\State choose $x_{i}$ randomly, with $Pr[x_{i}=0] = Pr[x_{i}=1] = 1/2$
+		\EndIf
+		\State $r=r+1$
+		\State Broadcast $propose(x_{i},r)$
+		\Until{decided (see Line 8)}
+		\State decision = $x_{i}$
+	\end{algorithmic}
+\end{algorithm}
+
+\bigskip
+\noindent
+Unfortunately, Algorithm \ref{alg:ben-or} is just a proof of concept that asynchronous byzantine agreement can be achieved, but practically it is unfeasible due to its exponential runtime.
+
+\bigskip
+\noindent
+Hence, an impossibility result by Fisher, Lynch and Paterson\footnote{The proof of Fisher, Lynch and Paterson \cite{Fischer:1985:IDC:3149.214121}, known as FLP and established in 1985, was awarded the 2001 PODC Influential Paper Award (now called Dijkstra Price)} comes in help:
+\begin{thm}
+    There is no deterministic algorithm which always achieves consensus in the asynchronous model, with $f>0$.
+\end{thm}
+
+\bigskip
+\noindent
+Due to this proven impossibility result, how Satoshi Nakamoto reaches consensus in Bitcoin, a decentralized, distributed, peer-to-peer network? Before delving into this clever resolution of the problem we need to strengthen our cryptographic background.
