@@ -2,27 +2,27 @@
 \label{chpr:consensus}
 
 \bigskip
-\section{Distributed systems}
+\section{Distributed Systems}
 With the persistent expansion of technology in the digital age we are going through, distributed systems are becoming more and more widespread.
 
 \bigskip
 \noindent
-On one side big companies operate on a global scale with thousands of machines deployed all over the world, big data are stored in various data centers and computational power is shared on multicore processors or computing clusters.
+On one side big companies operate on a global scale with thousands of machines deployed all over the world, big data are stored in various data centers and computational power is shared on multi-core processors or computing clusters.
 
 \bigskip
 \noindent
-On the other side, every day each of us operates with a distributed system; just think about a modern smartphone: it can share multiple data on the cloud and can contain multiple processing devices. Otherwise withdrawing money at the ATM is a perfect example of usage of a distributed system.
+On the other side, every day thousands of people withdraw money in a ATM point, a perfect example of distributed system. But simply, just think about a modern smartphone: it can share multiple data on the cloud and contain multiple co-working processing devices.
 
 \bigskip
 \noindent
-There is no a unique formal definition of distributed system. The one that fits better our interest is:
+However, there is no a unique formal definition of distributed system. The one that fits better our interest is:
 \begin{mydef} {\bf (distributed system)\footnote{\url{https://en.wikipedia.org/wiki/Distributed_computing}}}.
     A distributed system is a system whose components are located on different networked computers, which communicate and coordinate their actions by passing messages to one another. The components interact with one another in order to achieve a common goal. Three significant characteristics of distributed systems are: concurrency of components, lack of a global clock, and independent failure of components.
 \end{mydef}
 
 \bigskip
 \noindent
-Therefore the main reasons for using distributed systems are:
+Therefore, the main reasons for using distributed systems are:
 \begin{itemize}
     \item Scalability: Distributed systems should be scalable with respect to geography, administration or size.
     \item Performance: Compared to other models, distributed models are expected to give a much-wanted boost to performance.
@@ -38,52 +38,90 @@ However, beautiful features like these often have a downside, bringing to light 
     \item Security: Especially when using public networks.
     \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or Blockchain.}: In public distributed systems coordination problems are prevalent if proper protocols or policies are not in place; agents could be malevolent or malicious.
 \end{itemize}
+Thus, it can be easily inferred that one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, clock synchronization, PageRank, load balancing and many others. Let us get in a detailed study of what consensus is and how consensus can be achieved in a distributed system.
 
 \bigskip
-\section{Consensus}
-(reworka tutto) \\
-As we learned before, one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, and atomic broadcasts. The real world applications include clock synchronization, PageRank, opinion formation, smart power grids, state estimation, control of UAVs (and multiple robots/agents in general), load balancing and others. Let us get in formal definitions:
+\section{The Consensus Problem}
+Computers that run programs - nodes - are either \textit{honest}, executing programs faithfully, or \textit{byzantine} \cite{Lamport:1982:BGP:357172.357176}, exhibiting arbitrary behavior. We will also use the terms \textit{correct} and \textit{faulty}, but not as alternatives to honest and byzantine. A correct node is an honest node that always eventually makes progress. A faulty node is a Byzantine node or an honest node that has crashed or will eventually crash. Note that honest and Byzantine
+are mutually exclusive, as are correct and faulty. However, a node can be both honest and faulty.
 \begin{mydef} {\bf (node)}.
     We call a single actor in the system node. In a computer network the computers are the nodes, in the classical client-server model both the server and the client are nodes, and so on.
 \end{mydef}
+\begin{mydef} {\bf (byzantine node)\footnote{Before the term \textit{byzantine} was coined, the terms Albanian Generals or Chinese Generals were used in order to describe malicious behavior. When the involved researchers met people from these countries they moved, for obvious reasons, to the historic term byzantine.}}.
+    A node which can have arbitrary behaviour is called byzantine. This includes \enquote{anything imaginable}, e.g., not sending any massage at all, or sending different and wrong messages to different neighbors, or lying about the input value.
+\end{mydef}
+
+\bigskip
+\noindent
+We assume that each pair of nodes is connected by a link, which is a bi-directional reliable virtual circuit
+and therefore messages sent on this link are delivered, eventually, and in the order in which they were sent
+(i.e., an honest sender keeps retransmitting a message until it receives an acknowledgment or crashes). A
+receiver can tell who sent a message (e.g., using MACs), so a Byzantine node cannot forge a message so it
+is indistinguishable from a message sent by an honest node.
+
+\bigskip
+\noindent
+In the consensus problem nodes run \textit{actors}, that are either \textit{proposers}, each of which proposes a \textit{proposal}, or \textit{deciders}, each of which \textit{decides} one of the proposals. Assuming there exists at least one correct proposer
+(i.e., a proposer on a correct node), the goal of a consensus protocol is to ensure each correct decider decides
+the same proposal, even in the face of faulty proposers. A node may run both a proposer and a decider, in
+practice a proposer often would like to learn the outcome of the agreement.
 \begin{mydef} {\bf (consensus)}.\label{def:consensus}
-    There are $n$ nodes, of which at most $f$ might crash, i.e., at least $n-f$ nodes are correct. Node $i$ starts with an input value $v_{i}$. The nodes must decide for one of those values, satisfying the following properties:
+    There are $n$ nodes, of which at most $f$ might crash, i.e., at least $n-f$ nodes are correct. Node $i$ starts with a proposed value $v_{i}$. The nodes must decide for one of those values, satisfying the following properties:
     \begin{itemize}
-        \item Agreement: All correct noes decide for the same value.
+        \item Agreement: All correct nodes decide for the same proposal.
         \item Termination: All correct nodes terminate in finite time.
-        \item Validity: The decision value must be the input value of a node.
+        \item Validity: The decision value must be the proposal of some proposer.
     \end{itemize}
 \end{mydef}
 
 \bigskip
-\subsection{Two friends}
-Nota: preso da wattenhoefer.\\
-Alice wants to arrange dinner with Bob, and since both of them are very reluctant to use the \enquote{call} functionality of their phones, she sends a text message suggesting to meet for dinner at 6pm. However, texting is unreliable, and Alice cannot be sure that the message arrives at Bob's phone, hence she will only go to the meeting point if she receives a confirmation message from Bob. But Bob cannot be sure that his confirmation message is received; if the confirmation is lost, Alice cannot determine if Bob did not even receive her suggestion, or if Bob's confirmation was lost. Therefore, Bob demands a confirmation message from Alice, to be sure that she will be there. But as this message can also be lost...
+\noindent
+What is really interesting is to learn how to achieve distributed consensus in an asynchronous network in presence of byzantine nodes. Starting with the historical formulation of the problem and a first example of solved consensus in model that is synchronous, we will finally face a famous impossibility result in the asynchronous case.
+
+\bigskip
+\subsection{The Byzantine Generals' Problem}
+Distributed computer systems that want to be reliable must handle faulty components that give conflicting information to different parts of the system.
+
+\bigskip
+\begin{center}
+	\includegraphics[width=0.9\linewidth]{Images/byzantine.jpeg}
+	\captionof{figure}{Conquest of Constantinople}
+	\label{fig:figure4}
+	\source{\url{https://medium.com/all-things-ledger/the-byzantine-generals-problem-168553f31480}}
+\end{center}
 
 \bigskip
 \noindent
-You can see that such a message exchange continues forever, if both Alice and Bob want to be sure that the other person will come to the meeting point!
+The \enquote{Byzantine Generals' Problem} is the abstraction of the aforementioned situation.
+We imagine that several divisions of the Byzantine army are camped outside an enemy city, each division commanded by its own general. The generals communicate with one another as well as with all lieutenants only by messenger. After observing the enemy, they must decide upon a common plan of action: the exact time to attack all at once or, if faced by fierce resistance, the time to retreat all at once. The army cannot hold on forever, if the attack or retreat is without full strength then brutal defeat is the only possible outcome. However, some of the generals may be traitors, trying to prevent loyal generals from reaching agreement. 
+
+\bigskip
+\noindent
+For simplicity, we can restrict ourselves to the case of a commanding general sending an order to his lieutenants, obtaining the following problem.
+\begin{mydef}{\bf (byzantine generals' problem)}.
+\label{def:bgp}
+    A commanding general must send an order to his $n-1$ lieutenant generals such that the following conditions\footnote{Conditions \ref{cond:1} and \ref{cond:2} are called the \textit{interactive consistency} conditions} are satisfied:
+    \begin{enumerate}
+        \item \label{cond:1} All loyal lieutenants obey the same order.
+        \item \label{cond:2} If the commanding general is loyal, then every loyal lieutenant obeys the order he sends.
+    \end{enumerate}
+\end{mydef}
 
 \bigskip
 \subsection{Byzantine Agreement}
-It could happen that nodes in a distributed system do not just crash, instead they could behave arbitrarily or be voluntarily malevolent.
-\begin{mydef} {\bf (byzantine node)\footnote{Before the term \textit{byzantine} was coined, the terms Albanian Generals or Chinese Generals were used in order to describe malicious behavior. When the involved researchers met people from these countries they moved, for obvious reasons, to the historic term byzantine.}}.
-    A node which can have arbitrary behaviour is called byzantine. This includes \enquote{anything imaginable}, e.g., not sending any massage at all, or sending different and wrong messages to different neighbors, or lying about the input value.
-\end{mydef}
-\noindent
-Thus, achieving consensus (as in Definition \ref{def:consensus}) in a system with byzantine nodes is much more harder. A careful reader immediately realizes that fulfilling agreement and termination is straight-forward, but what about validity? Reminding that a byzantine node can be malevolent lying about its input value, we must specify different types of validity:
+Achieving consensus (as in Definition \ref{def:consensus}) in a system with byzantine nodes is hard stuff. A careful reader immediately realizes that fulfilling agreement and termination is straight-forward, but what about validity? Reminding that a byzantine node can be malevolent lying about its input value, we must specify different types of validity:
 \begin{mydef}{\bf (any-input validity)\footnote{This is the validity definition we implicitly used for consensus, in Definition \ref{def:consensus}}}.
-    The decision value must be the input value of any node.
+    The decision value must be the proposed value of any node.
 \end{mydef}
 \noindent
 As we can see, this definition does not still make sense in presence of byzantine nodes; we would wish for a differentiation between byzantine and correct inputs.
 \begin{mydef}{\bf (correct-input validity)}.
-    The decision value must be the input value of a correct node.
+    The decision value must be the proposed value of a correct node.
 \end{mydef}
 \noindent
-Achieving this particular validity definition is not so simple, as byzantine nodes following correctly a specified protocol but lying about theirs input values are indistinguishable from correct nodes. An alternative could be:
+Fulfilling this particular validity definition is not so simple, as byzantine nodes following correctly a specified protocol but lying about theirs input values are indistinguishable from correct nodes. An alternative could be:
 \begin{mydef}{\bf (all-same validity)}.
-    If all correct nodes start with the same input $v$, the decision value must be $v$.
+    If all correct nodes start with the same proposed value $v$, the decision value must be $v$.
 \end{mydef}
 \noindent
 Here, if the decision values are binary, then correct-input validity is induced by all-same validity. Else, if the input values are not binary, all-same validity is not useful anymore.
@@ -147,9 +185,9 @@ To be rigorous, we must state some useful lemmas in order to prove that Algorith
 
 \bigskip
 \noindent
-However, this is not the end of the story about distributed consensus. In order to dig into the hearth of this work we must introduce consensus results in asynchronous networks, in presence of byzantine nodes.
+However, this is not the end of the story about distributed consensus. In order to dig into the hearth of this work we must introduce consensus results in the asynchronous model.
 \begin{mydef}{\bf (asynchronous model)}.
-    In the asynchronus model, algorithms are event based (\enquote{upon receiving message ..., do ...}). Nodes do not have access to a synchronized wall-clock. A message sent from one node to another will arrive in a finite but unbounded time.
+    In the asynchronous model, algorithms are event based (\enquote{upon receiving message ..., do ...}). Nodes do not have access to a synchronized wall-clock. A message sent from one node to another will arrive in a finite but unbounded time.
 \end{mydef}
 \begin{mydef}{\bf (asynchronous runtime)}.
     For algorithms in the asynchronous model, the runtime is the number of time units from the start of the execution to its completion in the worst case (every legal input, every execution scenario), assuming that each message has a delay of at most one time unit.    
@@ -157,7 +195,7 @@ However, this is not the end of the story about distributed consensus. In order 
 
 \bigskip
 \noindent
-A famous algorithm by Ben-Or (more details in \cite{Ben-Or:1983:AFC:800221.806707}) tries to solve asynchronous byzantine agreement.
+We will now present a famous algorithm (Algorithm \ref{alg:ben-or}) by Ben-Or \cite{Ben-Or:1983:AFC:800221.806707}, which tries to solve asynchronous byzantine agreement.
 
 \bigskip
 \begin{algorithm}
@@ -189,11 +227,34 @@ A famous algorithm by Ben-Or (more details in \cite{Ben-Or:1983:AFC:800221.80670
 Unfortunately, Algorithm \ref{alg:ben-or} is just a proof of concept that asynchronous byzantine agreement can be achieved, but practically it is unfeasible due to its exponential runtime.
 
 \bigskip
+\subsection{Impossibility Result}
+A solution to the Byzantine Generals' Problem \ref{def:bgp} may seem a piece of cake. That's not true at all. Its difficulty arises from the fact that if the generals can send only oral messages, then no solution will work unless more than two-thirds of the generals are loyal. An oral message is one whose contents are completely under the control of the sender, so a traitorous sender can transmit any possible message.
+Such a message corresponds to the type of message that computers normally send to one another.
+
+\bigskip
 \noindent
-Hence, an impossibility result by Fisher, Lynch and Paterson\footnote{The proof of Fisher, Lynch and Paterson \cite{Fischer:1985:IDC:3149.214121}, known as FLP and established in 1985, was awarded the 2001 PODC Influential Paper Award (now called Dijkstra Price)} comes in help:
-\begin{thm}
-    There is no deterministic algorithm which always achieves consensus in the asynchronous model, with $f>0$.
-\end{thm}
+Let us now show that, if only oral messages are allowed, there is no solution for three generals with a single traitor. For simplicity, the only possible messages that generals can send are \enquote{attack} or \enquote{retreat}. This restriction opens two possible scenarios. In the first scenario, shown in Figure, a loyal commander sends an \enquote{attack} order to his lieutenants, but lieutenant 2 is malevolent and report \enquote{retreat} to lieutenant 1. In this situation, in order to satisfy Condition \ref{cond:2} of problem \ref{def:bgp}, lieutenant 1 must obey the order to attack. In the second scenario, shown in Figure, the commander is a traitor and sends an \enquote{attack} command to lieutenant 1, and a \enquote{retreat} order to lieutenant 2. But, lieutenant 1 does not know who is the traitor and cannot tell the order the commander sent to lieutenant 2. Thus, lieutenant 1 cannot distinguish in which scenario he belongs, so he always obey to the \enquote{attack} order. With a similar argument, if lieutenant 2 receive a \enquote{retreat} order from the commander, he must follow him even if lieutenant 1 reports him to attack. This violates Condition \ref{cond:1} of problem \ref{def:bgp}.
+
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{Images/scenario1.png}
+  \captionof{figure}{Lieutenant 2 is a traitor}
+  \label{fig:scenario1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{Images/scenario2.png}
+  \captionof{figure}{Commander is a traitor}
+  \label{fig:scenario2}
+\end{minipage}
+\source{\url{https://www.researchgate.net/figure/Byzantine-Generals-Problem-Lamport82_fig4_263046309}}
+\end{figure}
+
+\bigskip
+\noindent
+A demanding reader could comply about this nonrigorous result. A famous result\footnote{This result was awarded the 2001 PODC Influential Paper Award (now called Dijkstra Prize).} of Fisher, Lynch and Paterson \cite{Fischer:1985:IDC:3149.214121} formally proves impossibility of distributed consensus with one faulty process.
 
 \bigskip
 \noindent
