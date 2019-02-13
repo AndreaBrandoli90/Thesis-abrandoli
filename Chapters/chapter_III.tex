@@ -1,2 +1,46 @@
-\chapter{Cryptographic Background}
-\label{chpr:crypto}
+\chapter{Nakamoto Consensus in Bitcoin}
+\label{chpr:btc}
+Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his author Satoshi Nakamoto (metti nota sul nome), it lacked a formalization of the protocol and of the guarantees it claimed to provide.
+
+\bigskip
+\noindent
+This chapter delves into the core innovation behind Bitcoin, i.e. \textit{Nakamoto consensus}, term that is commonly used to refer to Bitcoin's novel consensus mechanism, which allows mutually distrusting pseudonymous identities to reach eventual agreement.
+
+\bigskip
+\section{Bitcoin \& Eventual Consistency}
+By its very nature, the Bitcoin network is subject to a type of failure called \textit{network partition}, where a network splits into at least two parts that cannot communicate with each other, often due to software bugs, incompatible protocol versions, or simply network disconnections.
+Thus, Bitcoin is inherently characterized by a trade-off between \textit{consistency}, \textit{availability} and \textit{partition tolerance}. Let us be more precise.
+\begin{mydef} {\bf (consistency)}.
+    All nodes in the system agree on the current state of the system.
+\end{mydef}
+\begin{mydef} {\bf (availability)}.
+    The system is operational and instantly processing incoming requests.
+\end{mydef}
+\begin{mydef} {\bf (partition tolerance)}.
+    Partition tolerance is the ability of a distributed system to continue operating correctly even in the presence of a network partition.
+\end{mydef}
+
+\bigskip
+\noindent
+In practice, only two of these properties can be reached simultaneously; a theorem by Brewer proves this result.
+\begin{thm} {\bf (CAP theorem)}.
+    It is impossible for a distributed system to simultaneously provide consistency, availability and partition tolerance. A distributed system can satisfy any two of these but not all three.
+\end{thm}
+\begin{proof}
+    Let us assume two nodes that share some state. The nodes belongs to different partitions, so they cannot communicate each other. Assume a request wants to update the state and contacts one of the two nodes. The node may either: 1) update its local state, resulting in a situation of inconsistent states, or 2) not update, resulting in a system no longer available for updates.
+\end{proof}
+
+\bigskip
+\noindent
+Recalling the Definition \ref{def:consensus} of consensus and the properties it must satisfy, a clever intuition of Nakamoto is to weaken the agreement property to hold probabilistically and not deterministically, in order to deal with an asynchronous network. In particular the aforementioned trade-off is in advantage of partition tolerance rather than consistency. In fact, state changes of the underlying transaction ledger (i.e. the blockchain), are rendered probabilistic and the decision on a specific value of the state reaches $Pr(1)$ when $\lim_{r \to \infty}$, where $r$ is the number of rounds in the consensus protocol.
+
+\bigskip
+\noindent
+Therefore, we can define Bitcoin as an example of \textit{eventual consistency}.
+\begin{mydef}{\bf (eventual consistency)}
+    If no new updates to the shared state are issued, then eventually the system is in a quiescent state, i.e., no more messages need to be exchanged between nodes, and the shared state is consistent.
+\end{mydef}
+
+\bigskip
+\noindent
+Questo è un primo passo per comprendere come nakamoto risolve il consenso distribuito in Bitcoin, per comprenderlo a pieno serve innanzitutto un background crittografico e lo studio di possibili attacchi al network dall'esterno per domostrare la solidità e l'immutabilità della blockchain sottostante (hash pointers)...quindi hash, commit, merkle trees, miner incentives, pow.
