@@ -36,12 +36,14 @@ Recalling the Definition \ref{def:consensus} of consensus and the properties it 
 
 \bigskip
 \noindent
-Therefore, we can define Bitcoin as an example of \textit{eventual consistency}.
+Therefore, we can look at Bitcoin as an example of \textit{eventual consistency}.
 \begin{mydef}{\bf (eventual consistency)}
     If no new updates to the shared state are issued, then eventually the system is in a quiescent state, i.e., no more messages need to be exchanged between nodes, and the shared state is consistent.
 \end{mydef}
 
 \bigskip
 \noindent
-Questo è un primo passo per comprendere come nakamoto risolve il consenso distribuito in Bitcoin, per comprenderlo a pieno serve innanzitutto un background crittografico e lo studio di possibili attacchi al network dall'esterno per domostrare la solidità e l'immutabilità della blockchain sottostante (hash pointers)...quindi hash, commit, merkle trees, miner incentives, pow.
-Poi chiedere per il capitolo sul timestamp e ots standard protocol se posso prenderlo da leo (è la miglior spiegazione)
+Now that we have clear in mind the consensus problem in a computer science point of view, we must move forward and study how practically Nakamoto consensus works. Starting from a brief introduction of some basic Bitcoin mechanics we will dig into cryptography concepts and one another innovative idea: economic incentives in a consensus protocol.
+
+\bigskip
+\section{Bitcoin Mechanics}
