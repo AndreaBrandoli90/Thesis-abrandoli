@@ -25,24 +25,24 @@ However, there is no a unique formal definition of distributed system. The one t
 Therefore, the main reasons for using distributed systems are:
 \begin{itemize}
     \item Scalability: Distributed systems should be scalable with respect to geography, administration or size.
-    \item Performance: Compared to other models, distributed models are expected to give a much-wanted boost to performance.
-    \item Fault Tolerance: A cluster of multiple machines is inherently more fault-tolerant than a single one.
+    \item Performance: Compared to other models, distributed models are expected to give a higher boost to performance.
+    \item Fault Tolerance: A cluster of multiple machines is inherently more fault-tolerant than a single source of failure.
     \item Reliability: Data is replicated on different machines in order to prevent loss.
-    \item Availability: Data is replicated on different machines to minimize latency and grant fast access.
+    \item Availability: Data is replicated on different machines to minimize latency and provide faster access.
 \end{itemize}
 
 \bigskip
 \noindent
 However, beautiful features like these often have a downside, bringing to light some challenging problems:
 \begin{itemize}
-    \item Security: Especially when using public networks.
+    \item Security: Especially when networks are public.
     \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or Blockchain.}: In public distributed systems coordination problems are prevalent if proper protocols or policies are not in place; agents could be malevolent or malicious.
 \end{itemize}
 Thus, it can be easily inferred that one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, clock synchronization, PageRank, load balancing and many others. Let us get in a detailed study of what consensus is and how consensus can be achieved in a distributed system.
 
 \bigskip
 \section{The Consensus Problem}
-Computers that run programs - nodes - are either \textit{honest}, executing programs faithfully, or \textit{byzantine} \cite{Lamport:1982:BGP:357172.357176}, exhibiting arbitrary behavior. We will also use the terms \textit{correct} and \textit{faulty}, but not as alternatives to honest and byzantine. A correct node is an honest node that always eventually makes progress. A faulty node is a Byzantine node or an honest node that has crashed or will eventually crash. Note that honest and Byzantine
+Networks are composed by many agents, called \textit{nodes}. Think of a computer network, nodes are either \textit{honest}, executing programs faithfully, or \textit{byzantine} \cite{Lamport:1982:BGP:357172.357176}, exhibiting arbitrary behavior. We will also define them \textit{correct} and \textit{faulty}, but not as alternatives to honest and byzantine. A correct node is an honest node that always eventually makes progress. A faulty node is a Byzantine node or an honest node that has crashed or will eventually crash. Note that honest and Byzantine
 are mutually exclusive, as are correct and faulty. However, a node can be both honest and faulty.
 \begin{mydef} {\bf (node)}.
     We call a single actor in the system node. In a computer network the computers are the nodes, in the classical client-server model both the server and the client are nodes, and so on.
@@ -83,12 +83,12 @@ What is really interesting is to learn how to achieve distributed consensus in a
 Distributed computer systems that want to be reliable must handle faulty components that give conflicting information to different parts of the system.
 
 \bigskip
-\begin{center}
+\begin{figure}[h]
 	\includegraphics[width=0.9\linewidth]{Images/byzantine.jpeg}
-	\captionof{figure}{Conquest of Constantinople}
+	\caption{Conquest of Constantinople}
 	\label{fig:figure4}
 	\source{\url{https://medium.com/all-things-ledger/the-byzantine-generals-problem-168553f31480}}
-\end{center}
+\end{figure}
 
 \bigskip
 \noindent

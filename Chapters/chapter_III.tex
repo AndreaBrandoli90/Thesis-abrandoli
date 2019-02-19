@@ -1,6 +1,6 @@
 \chapter{Nakamoto Consensus in Bitcoin}
 \label{chpr:btc}
-Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his author Satoshi Nakamoto (metti nota sul nome), it lacked a formalization of the protocol and of the guarantees it claimed to provide.
+Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his author Satoshi Nakamoto\footnote{The name Satoshi Nakamoto is the pseudonym adopted by the creator of Bitcoin. While his identity remains a mystery, some information is known. He registered the domain bitcoin.org in August 2008 and in October 2008 he publicly released the famous white paper. In the Bitcoin's early days he participated extensively in forums and mailing lists maintaining the souce code. During the next two years other contributors slowly taken over the project maintenance and he stopped communicating, leaving a veil of mystery.}, it lacked a formalization of the protocol and of the guarantees it claimed to provide.
 
 \bigskip
 \noindent
@@ -43,7 +43,30 @@ Therefore, we can look at Bitcoin as an example of \textit{eventual consistency}
 
 \bigskip
 \noindent
-Now that we have clear in mind the consensus problem in a computer science point of view, we must move forward and study how practically Nakamoto consensus works. Starting from a brief introduction of some basic Bitcoin mechanics we will dig into cryptography concepts and one another innovative idea: economic incentives in a consensus protocol.
+Now that we have clear in mind the consensus problem from a computer science perspective, we must move forward and study how practically Nakamoto consensus works. Starting from a brief introduction of some basic Bitcoin mechanics we will dig into cryptography concepts and one another innovative idea: economic incentives in a consensus protocol.
 
 \bigskip
-\section{Bitcoin Mechanics}
+\section{Bitcoin Design}
+We already defined Bitcoin as a distributed, decentralized, peer-to-peer electronic payment system, but we lacked about defining the underlying digital asset, i.e. \textit{bitcoin}, and the challenges in building it, and also the fundamental bricks of the Bitcoin wall. Combining all these aspects is crucial to fully understand Nakamoto consensus.
+
+\bigskip
+\subsection{Constructing a Decentralized Digital Currency}
+\textit{Ownership} is the first challenge of constructing a virtual currency. Imagine units of fiat currencies, their ownership depends on their form. If these units are in the form of paper notes or metal coins, ownership is simply determined by physical possession. Else, if these units are digitally stored in a bank account, ownership is determined by possession of the credentials to spend them. But what about ownership for a decentralized virtual currency? Who maintains the ledger of credentials? How can we guarantee the integrity of that ledger? In a network like Bitcoin nodes are free to leave at any time, thus a single source of trust (a node or a group of them) cannot be given this responsibility, even if one-way functions protects credentials. A solution could be that all nodes maintain a copy of that ledger, but what about validation? Can I feasible query all the nodes? Integrity is also crucial: usually digital signatures ensure it, but reminds the nodes could act maliciously and so, can I trust the signer?
+
+\bigskip
+\noindent
+Another big challenge is the so called \textit{double spending} problem. This refers to the fact that the owner of some units of digital currency could spend them more than once. With fiat currencies, granted by a central authority, this problem cannot occur. In fact the bank database is the single source of truth with regard to the deposited amount of currency. Thus, spending with f.e. an online transfer, would immediately result in the rebalancing of that account to reflect the spend. However, in a peer-to-peer decentralized network some malicious agent could try to perform a double spend taking advantage of the delay in updating the shared ledger. An example will explain better.
+
+\begin{figure}[!htbp]
+    \includegraphics[width=1\linewidth]{Images/double-spending.png}
+    \caption{Illustration of the double spending problem}
+    \label{fig:double}
+\end{figure}
+
+\bigskip
+\noindent
+Consider the scenario described in Figure \ref{fig:double} where Alice tries to perform a double spend using some digital coins in her wallet. She would purchase a cake from Bob and a book from Charlie spending the same $n$ coins. For simplicity, let us assume that the two items cost the same, precisely $n$ units of currency. Thus, in order to finalize the purchase, both Bob and Charlie will provide Alice with their wallet addresses. Then Alice creates two different transactions, both spending the same $n$ coins, one paying Bob for the cake and the other paying Charlie for the book. The network will only accept one of them because the two transactions conflict. But there are several nodes in the network, some of which can be made to accept one of the transactions and the rest to accept the other. So Alice can transmit the transaction paying Bob to the portion of the network which Bob is connected to and the same argument holds for Charlie's transaction. Therefore, when Bob and Charlie query the balances in their private wallets they both will find a valid payment. If they provide Alice with their goods before being aware that the two transactions are conflicting, the result is that Alice has successfully performed a double spend.
+
+\bigskip
+\subsection{Bitcoin Mechanics}
+Nakamoto solves brilliantly the aforementioned challenges in Bitcoin combining cryptography and social incentive engineering. But first we need a brief summary of the mechanics of the protocol.
