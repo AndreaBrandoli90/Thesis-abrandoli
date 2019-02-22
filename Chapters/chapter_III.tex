@@ -7,7 +7,7 @@ Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system 
 This chapter delves into the core innovation behind Bitcoin, i.e. \textit{Nakamoto consensus}, term that is commonly used to refer to Bitcoin's novel consensus mechanism, which allows mutually distrusting pseudonymous identities to reach eventual agreement.
 
 \bigskip
-\section{Bitcoin \& Eventual Consistency}
+\section{Eventual Consistency}
 By its very nature, the Bitcoin network is subject to a type of failure called \textit{network partition}, where a network splits into at least two parts that cannot communicate with each other, often due to software bugs, incompatible protocol versions, or simply network disconnections.
 Thus, Bitcoin is inherently characterized by a trade-off between \textit{consistency}, \textit{availability} and \textit{partition tolerance}. Let us be more precise.
 \begin{mydef} {\bf (consistency)}.
@@ -43,11 +43,11 @@ Therefore, we can look at Bitcoin as an example of \textit{eventual consistency}
 
 \bigskip
 \noindent
-Now that we have clear in mind the consensus problem from a computer science perspective, we must move forward and study how practically Nakamoto consensus works. Starting from a brief introduction of some basic Bitcoin mechanics we will dig into cryptography concepts and one another innovative idea: economic incentives in a consensus protocol.
+Now that we have clear in mind the consensus problem from a computer science perspective, we must move forward and study how practically Nakamoto consensus works. Starting from a brief summary of some basic Bitcoin mechanics, we will finally show how cleverly Nakamoto solves the consensus problem in Bitcoin, going through cryptography tools and game theory aspects.
 
 \bigskip
 \section{Bitcoin Design}
-We already defined Bitcoin as a distributed, decentralized, peer-to-peer electronic payment system, but we lacked about defining the underlying digital asset, i.e. \textit{bitcoin}, and the challenges in building it, and also the fundamental bricks of the Bitcoin wall. Combining all these aspects is crucial to fully understand Nakamoto consensus.
+We already defined Bitcoin as a distributed, decentralized, peer-to-peer electronic payment system, but we lacked about defining the underlying digital asset, i.e. \textit{bitcoin}, the challenges in building it, and also the fundamental bricks of the Bitcoin wall. Combining all these aspects is crucial to fully understand Nakamoto consensus.
 
 \bigskip
 \subsection{Constructing a Decentralized Digital Currency}
@@ -58,6 +58,7 @@ We already defined Bitcoin as a distributed, decentralized, peer-to-peer electro
 Another big challenge is the so called \textit{double spending} problem. This refers to the fact that the owner of some units of digital currency could spend them more than once. With fiat currencies, granted by a central authority, this problem cannot occur. In fact the bank database is the single source of truth with regard to the deposited amount of currency. Thus, spending with f.e. an online transfer, would immediately result in the rebalancing of that account to reflect the spend. However, in a peer-to-peer decentralized network some malicious agent could try to perform a double spend taking advantage of the delay in updating the shared ledger. An example will explain better.
 
 \begin{figure}[!htbp]
+    \centering
     \includegraphics[width=1\linewidth]{Images/double-spending.png}
     \caption{Illustration of the double spending problem}
     \label{fig:double}
@@ -68,5 +69,118 @@ Another big challenge is the so called \textit{double spending} problem. This re
 Consider the scenario described in Figure \ref{fig:double} where Alice tries to perform a double spend using some digital coins in her wallet. She would purchase a cake from Bob and a book from Charlie spending the same $n$ coins. For simplicity, let us assume that the two items cost the same, precisely $n$ units of currency. Thus, in order to finalize the purchase, both Bob and Charlie will provide Alice with their wallet addresses. Then Alice creates two different transactions, both spending the same $n$ coins, one paying Bob for the cake and the other paying Charlie for the book. The network will only accept one of them because the two transactions conflict. But there are several nodes in the network, some of which can be made to accept one of the transactions and the rest to accept the other. So Alice can transmit the transaction paying Bob to the portion of the network which Bob is connected to and the same argument holds for Charlie's transaction. Therefore, when Bob and Charlie query the balances in their private wallets they both will find a valid payment. If they provide Alice with their goods before being aware that the two transactions are conflicting, the result is that Alice has successfully performed a double spend.
 
 \bigskip
-\subsection{Bitcoin Mechanics}
+\noindent
 Nakamoto solves brilliantly the aforementioned challenges in Bitcoin combining cryptography and social incentive engineering. But first we need a brief summary of the mechanics of the protocol.
+
+\bigskip
+\subsection{Transactions and Blockchain Structure}
+In Bitcoin, a coin or a \textit{bitcoin} is defined as a chain of digital signatures. Coins cannot be combined, subdivided or transferred, they can only be entirely consumed as transaction inputs (TxIn) in order to create new output coins (TxOut). Thus, a transaction output can only be in two states, \textit{spent} or \textit{unspent}. The set of current unspent coins takes the name of UTXO (Unspent Transaction Outputs). So, a \textit{transaction} assumes the role of the fundamental unit of state in the Bitcoin protocol.
+
+\bigskip
+\noindent
+More precisely, each Tx\footnote{It's a common practice in Bitcoin community to abbreviate the word \textit{transaction} as Tx or sometimes TX.} output consists of an amount of bitcoins and a cryptographic puzzle, the so-called \textit{locking script}, which determines the spending conditions for that amount. An example of such a puzzle could be a request for a digital signature which can be validated with a public key. On the other side, a Tx input is characterized by a pointer referencing the UTXO that it consumes and an \textit{unlocking script}, the solution to the aforementioned locking script, which proves that funds in the considered transaction can be honestly spent.
+
+\bigskip
+\noindent
+All the transactions, starting from the time the protocol was launched\footnote{The first block of the chain, called the \textit{genesis} block, was generated in January 2009}, are securely recorded in a distributed ledger, shaped as a sequence of blocks, the \textit{blockchain}. In a technical cryptographic perspective, the \textit{blockchain} is a hash pointer linked list, whose aim is to be a \textit{tamper-evident} log. That is, a log data structure that stores some data (mainly transactions) allowing only to append new data onto the end of the log but, if somebody alters some earlier data then it would be easily detected. Figure \ref{fig:blockchain} provides a graphic idea of the structure.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/blockchain.png}
+    \caption{Blockchain as a hash pointer linked list}
+    \label{fig:blockchain}
+    \source{\cite{Narayanan:2016:BCT:2994437}}
+\end{figure}
+
+\newpage
+\bigskip
+\noindent
+The aforementioned \textit{tamper-evidence} property derives from cryptography, so we must introduce some primitives. But first a bit of history. The ideas behind the blockchain trace back to a paper by Haber and Stornetta in 1991 \cite{Haber91howto}. They proposed a method to \textit{timestamp} digital documents, that is a method to give an idea of when a document came into exixtance. To achieve this goal, a timestamping server receives client documents to timestamp. Then it signs the documents (one by one) together with the current time, and a special type of pointer that links to a piece of data instead of a location, pointing to the previous document. Thus, if some data is tampered, that pointer turns to be invalid. Finally the timestamping server issues a certificate containing such information. Therefore it is clear that each document's certificate ensures the integrity of the previous document.
+
+\subsection{Hash Functions and Pointers}
+The more the world becomes digital, the more we need information security. Cryptography mixes advanced mathematical and computer science techniques to provide confidentiality, data integrity, authentication and non-repudiation.
+
+\bigskip
+\noindent
+A \textit{hash function} is a particular mathematical function that maps an arbitrary length input message into a short, fixed-length bit string, usually called \textit{digest} or \textit{hash value}. Hash functions can be seen as a digital fingerprint of a message, i.e. a unique representation of a message.
+
+\begin{mydef}
+    \label{def:hash}
+	A function $h : \{ 0, 1 \} ^* \rightarrow \{ 0, 1 \} ^n $ is a hash function if it is computable in polynomial time in the length of the input.
+\end{mydef}
+
+\bigskip
+\noindent
+This definition lacks of security arguments. There are three main properties that hash functions need to possess in order to provide security:
+\begin{mydef}
+	\label{hash-prop}
+	Let $h$ be a hash function, the following properties may hold:
+	\begin{itemize}
+		\item preimage resistance (one-wayness): given $h(x)$ it is not feasible to compute $x$;
+		\item second-preimage resistance (weak collision resistance): given $x$ it is not feasible to compute $y$ s.t. $x \neq y$, $h(x)=h(y)$;
+		\item collision resistance (strong collision resistance): it is not feasible to find $x, y$ s.t. $x \neq y$, $h(x)=h(y)$.
+	\end{itemize}
+\end{mydef}
+
+\bigskip
+\noindent
+A hash function that fulfills the preimage resistance property \textit{hides} the input, so one cannot derive a matching message from a hash value. A second-preimage resistant hash function prevents that, given a message, one can find another message that produces the same output once hashed. Unfortunately such a property cannot exist in theory, due to the so-called \textit{pigeonhole principle}\footnote{Formally this principle takes the name of \textit{Dirichlet's drawer principle}, but it is commonly referred to as the \textit{pigeonhole principle}.}. Suppose to be the owner of 100 pigeons but in your pigeon loop are only 99 holes, at least one pigeonhole will be occupied by 2 birds. The same argument holds for hash functions. Since the output of a hash function has a fixed bit length, say $n$ bits, there exist only $2^{n}$ possible output values. However the length of input values is arbitrary, resulting in an infinite number of possible inputs. Thus, weak collision can occur. Fortunately, given today's computers, an output length of $n=80$ bits is sufficient to prevent collisions. To sum up, collisions do exist, but they are \textit{unfeasible}. Finally, the strong collision resistance property refers to the problem of finding two messages that generate the same hash value. With an output length of $n=80$ bits as before, producing $2^{80}$ possible values, one may think that finding two inputs generating the same output would require around $\frac{2^{80}}{2}$, a half of the possible values. That's completely wrong, due to the \textit{birthday paradox}, a powerful cryptographic tool which deserves a formal definition.
+\begin{mydef} {\bf (birthday paradox)}.
+    The birthday paradox concerns the probability that, given a set of $n$ randomly chosen people, some pair of them will have the same birthday.
+\end{mydef}
+
+\bigskip
+\noindent
+The correct approach to solve this problem is to compute the probability of two people \textit{not} having the same birthday:
+$$P(\text{2 people not colliding}) = \left(1-\frac{1}{365} \right)$$
+If a third person is joining:
+$$P(\text{3 people not colliding}) = \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right)$$
+Hence, the probability for $t$ people having no birthday collision is given by:
+$$P(\text{$t$ people not colliding}) = \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right) \dotsm \left(1-\frac{t-1}{365} \right)$$
+Then, making some simple calculations, it turns out that it only requires 23 people to have a probability of about 0.5 for a birthday collision:
+\begin{equation*}
+\begin{split}
+    P(\text{at least one collision}) &= 1 - P(\text{no collision}) \\
+            &= \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right) \dotsm \left(1-\frac{23-1}{365} \right) \\
+            &= 0.507 \approx 50 \%
+\end{split}
+\end{equation*}
+The search of a collision for a hash function is exactly the same problem as the birthday problem, obviously with different parameters. Again, let $n$ be the output length in bits, thus resulting in $2^{n}$ possible output values. Here, the probability of no collisions among $t$ hash values is:
+\begin{equation*}
+\begin{split}
+    P(\text{no collision}) &= \left(1-\frac{1}{2^{n}} \right) \cdot \left(1-\frac{2}{2^{n}} \right) \dotsm \left(1-\frac{t-1}{2^{n}} \right) \\
+            &= \prod\limits_{i=1}^{t-1} \left(1-\frac{i}{2^{n}} \right) \\
+            &\approx \prod\limits_{i=1}^{t-1} e^{- \frac{i}{2^{n}}} \\
+            &\approx e^{- \frac{t(t-1)}{2\cdot 2^{n}}}
+\end{split}
+\end{equation*}
+Remind that we want to find how many messages are required to find a collision. Let $\lambda$ be the probability of at least one collision:
+$$\lambda \approx 1 - e^{- \frac{t(t-1)}{2^{n+1}}}$$
+Solving for $t$ and observing that, since in practice $t>>1$, it holds that $t^{2}\approx t(t-1)$ we obtain:
+$$t\approx 2^{(n+1)/2} \sqrt{\ln{\left(\frac{1}{1-\lambda}\right)}}$$
+The main takeaway of these computations is that the number of messages needed to find a collision of hash values is proportional to the square root of the number of possible output values.
+
+\bigskip
+\noindent
+Riportare qui una tabellina coi valori, prendi da Pelzl and Paar (vedere per il titoletto delle sole colonne).
+
+\bigskip
+\noindent
+\begin{myexample}
+	SHA256 belongs to the family SHA2, the generation of hash functions following SHA1\footnote{Currently, it is available SHA3, which contains, among others, KECCAK256.}. It outputs  strings 256 bit long and, at the moment, it is considered to satisfy all the properties in Definition \ref{hash-prop}.
+	Several systems are built upon this assumption. 
+	In addition, as other hash functions, SHA256 could be modeled as a random oracle, a fixed input will provide always the same output, since hash functions are deterministic, but the outputs corresponding to new inputs will give results that are indistinguishable from a uniform distribution. 
+	Note how a little change in the input produces outputs very dissimilar in both hash functions, this feature helps to spot alterations in the inputs.
+	\begin{verbatim}
+	SHA256(b'Hello World!\n') = 03ba204e50d126e4674c005e04d82e84c21
+	                            366780af1f43bd54a37816b6ab340
+	SHA256(b'Hello World\n')  = d2a84f4b8b650937ec8f73cd8be2c74add5
+	                            a911ba64df27458ed8229da804a26
+	\end{verbatim}
+	Since SHA256 is available, the use of SHA1 should be avoided unless there is a particular motivation. 
+\end{myexample}
+
+\bigskip
+\noindent
+
+Sistema l'esempio ed aggiungi hash pointers, poi la parte del mining, pow, network behaviour, supply e forks. Spiega dunque come Nakamoto risolve le main challenges nel costruire una moneta decentralizzata.
