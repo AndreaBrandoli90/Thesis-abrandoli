@@ -85,7 +85,7 @@ In this section we will answer the following question: \enquote{\textit{What is 
 
 \bigskip
 \noindent
-Without further going into details regarding computer science\footnote{For more details, see https://en.wikipedia.org/wiki/Remote\_procedure\_call}, a RPC (Remote Procedure Call) is a powerful technique for constructing distributed, client-server based applications. It is based on the extension of the conventional procedure calling, so that the called procedure need not exist in the same address space as the calling procedure. The two processes may be on the same system, or they may be on different systems with a network connecting them. Our interest is for the \colorbox{Grey!10}{bitcoin-cli}, a handy interface that lets the user send commands to the \colorbox{Grey!10}{bitcoind}. More specifically, it lets you send RPC commands to the \colorbox{Grey!10}{bitcoind}. Generally, the \colorbox{Grey!10}{bitcoin-cli} interface is much more clean and user friendly than trying to send RPC commands by hand, using \colorbox{Grey!10}{curl} or some other method.
+Without further going into details regarding computer science\footnote{For more details, see \url{https://en.wikipedia.org/wiki/Remote\_procedure\_call}.}, a RPC (Remote Procedure Call) is a powerful technique for constructing distributed, client-server based applications. It is based on the extension of the conventional procedure calling, so that the called procedure need not exist in the same address space as the calling procedure. The two processes may be on the same system, or they may be on different systems with a network connecting them. Our interest is for the \colorbox{Grey!10}{bitcoin-cli}, a handy interface that lets the user send commands to the \colorbox{Grey!10}{bitcoind}. More specifically, it lets you send RPC commands to the \colorbox{Grey!10}{bitcoind}. Generally, the \colorbox{Grey!10}{bitcoin-cli} interface is much more clean and user friendly than trying to send RPC commands by hand, using \colorbox{Grey!10}{curl} or some other method.
 
 \bigskip
 \noindent
@@ -300,120 +300,4 @@ For example \colorbox{Grey!10}{bitcoin-cli getwalletinfo} gives the user precise
 }
 \end{lstlisting}
 
-\bigskip
-\noindent
-In the next sections we will deal with notarization, in particular we will get into technical details of \textit{OpenTimestamps} protocol.
-
-\bigskip
-\section{OpenTimestamps client}
-\textit{OpenTimestamps} client is a command-line tool to perform stamping of documents and to verify \textit{OpenTimestamps} proofs, using the Bitcoin blockchain as a timestamp notary. \\
-After this step-by-step tutorial we will be able to fully manage the Python release of the \textit{OpenTimestamps} client.
-
-\bigskip
-\noindent
-Before installing the \textit{OpenTimestamps} client, we must remind that while you can \textit{create} timestamps without a local Bitcoin Core node, to \textit{verify} proofs you need one (a pruned node is fine too, metti la nota per spiegare perche').
-
-\bigskip
-\noindent
-Let us get into a step-by-step guide to fully manage \textit{OpenTimestamps} client in all its features:
-\begin{itemize}
-\item Install client (Python3 required):\bigskip
-\begin{lstlisting}
- $ pip3 install opentimestamps-client
-\end{lstlisting}
-\item Install the necessary dependencies:\bigskip
-\begin{lstlisting}
- $ sudo apt-get install python3 python3-dev python3-pip python3-setuptools python3-wheel
-\end{lstlisting}
-\item Pick a file or create a new one to timestamp:\bigskip
-\begin{lstlisting}
- $ cat > filename.txt
- bla bla bla (write what you want)
- CTRL+D (to close file and return to command prompt)
-\end{lstlisting}
-\item Timestamp your example file:\bigskip
-\begin{lstlisting}[breakatwhitespace=true]
- $ ots stamp filename.txt 
- Submitting to remote calendar https://a.pool.opentimestamps.org
- Submitting to remote calendar https://b.pool.opentimestamps.org
- Submitting to remote calendar https://a.pool.eternitywall.com
- Submitting to remote calendar  https://ots.btc.catallaxy.com
-\end{lstlisting}
-Nice! Your timestamp request is submitted to the main public calendar servers.
-
-\bigskip
-\noindent
-Now in your current directory you must have a file named \colorbox{Grey!10}{filename.txt.ots} that is the proof of your timestamp\footnote{More specifically, an \textit{OpenTimestamps} proof is the path up to merkleroot of the block which contains the relative transaction.}.
-\item Verify the proof (local Bitcoin Core node needed):\bigskip
-\begin{lstlisting}
- $ ots verify filename.txt.ots 
- Assuming target filename is 'filename.txt'
- Calendar https://bob.btc.calendar.opentimestamps.org: Pending confirmation in Bitcoin blockchain
- Calendar https://alice.btc.calendar.opentimestamps.org: Pending confirmation in Bitcoin blockchain
- Calendar https://btc.calendar.catallaxy.com: Pending confirmation in Bitcoin blockchain
- Calendar https://finney.calendar.eternitywall.com: Pending confirmation in Bitcoin blockchain
-\end{lstlisting}
-Notice that you can't verify immediately the above-mentioned proof: it takes a few hours for the timestamp to get confirmed by the Bitcoin blockchain; \textit{OpenTimestamps} is not doing one transaction per timestamp.
-
-\bigskip
-\noindent
-Now the proof is \textit{incomplete} because it needs the assistance of a remote calendar to verify; the calendar provides the path to the Bitcoin block header. You can check for the current status of your proof file with the \colorbox{Grey!10}{info} command.
-\item Get detailed proof information:\bigskip
-\begin{lstlisting}[breakatwhitespace=true]
- $ ots info filename.txt.ots 
- File sha256 hash: 13a1f687ddb7c1a0b12adeb708a2b464c9 cfc24d5c9def4fa775cca81162feed
- Timestamp:
- append 5669aa818cc1c5bf8129d469f884fe79
- sha256
-  -> append 0f2a11ae083c66674d9d0d3da049079e
-     sha256
-     prepend f6836f41e86344eb7e4da03fe57c3e998d13594b2a27b4 ccb86cef8ac19cf69e
-     sha256
-     prepend 5c502267
-     append 2c767f767b02b45c
-     verify PendingAttestation ('https://bob.btc.calendar.opentimestamps.org')
-  -> append 675406ae56e9e40809ac587ee009067c
-     sha256
-     append 7690b939b5a663ea311992aadf2f182424cea544bbfb2a 837ae366ba5cc1ecf4
-     sha256
-     prepend 5c502266
-     append 1269e2007cc47092
-     verify PendingAttestation ('https://alice.btc.calendar.opentimestamps.org')
-  -> append 9b10d7ec7f0af842407d2d7cbebac9ad
-     sha256
-     prepend 5c502267
-     append da1d41ee8803dff5
-     verify PendingAttestation ('https://btc.calendar.catallaxy.com')
-  -> append f923446e73e3a503121a56006723a6c1
-     sha256
-     append c35e379ef7097a65fdbfb2a594a93c75
-     sha256
-     prepend 5c502266
-     append c47a3b08bfc2315e
-     verify PendingAttestation ('https://finney.calendar.eternitywall.com')
-\end{lstlisting}
-Incomplete timestamps can be upgraded using the \colorbox{Grey!10}{upgrade} command which adds the path to the Bitcoin blockchain to the timestamp itself. Upgrading a proof isn't always available: there must be at least one completed attestation.
-\item Upgrade the proof: \bigskip
-\begin{lstlisting}[breakatwhitespace=true]
- $ ots upgrade filename.txt.ots 
- Got 1 attestation(s) from https://bob.btc.calendar.opentimestamps.org
- Got 1 attestation(s) from https://alice.btc.calendar.opentimestamps.org
- Got 1 attestation(s) from https://btc.calendar.catallaxy.com
- Got 1 attestation(s) from https://finney.calendar.eternitywall.com
- Success! Timestamp complete
-\end{lstlisting}
-In this case the timestamp is fully confirmed by Bitcoin Blockchain, so upgrading the proof succeeded.
-
-\bigskip
-\noindent
-Now that we know for sure that timestamping succeeded, you only left to verify the proof another time to check which block attested your timestamp (add the flag \colorbox{Grey!10}{-v} to be more verbose).\bigskip
-\begin{lstlisting}[breakatwhitespace=true]
- $ ots -v verify filename.txt.ots
- Assuming target filename is 'filename.txt'
- Hashing file, algorithm sha256
- Got digest 13a1f687ddb7c1a0b12adeb708a2b464c9cfc24d5c9def 4fa775cca81162feed
- Attestation block hash: 00000000000000000013e603482 1d3d85e8a8ff0217482e4b2ab602ec7ab6ce7
- Success! Bitcoin block 560604 attests existence as of 2019-01-29 CET
-\end{lstlisting}
-\end{itemize}
 

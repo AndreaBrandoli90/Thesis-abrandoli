@@ -41,13 +41,14 @@ However, beautiful features like these often have a downside, bringing to light 
 Thus, it can be easily inferred that one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, clock synchronization, PageRank, load balancing and many others. Let us get in a detailed study of what consensus is and how consensus can be achieved in a distributed system.
 
 \bigskip
-\section{The Consensus Problem}
+\section[The Consensus Problem]{The Consensus Problem\footnote{Definitions and Algorithms presented in this section are taken from \cite{Wattenhofer:2016:SB:3002702}, a book in which the author deeply delves into the problem of achieving consensus in distributed systems.}} 
 Networks are composed by many agents, called \textit{nodes}. Think of a computer network, nodes are either \textit{honest}, executing programs faithfully, or \textit{byzantine} \cite{Lamport:1982:BGP:357172.357176}, exhibiting arbitrary behavior. We will also define them \textit{correct} and \textit{faulty}, but not as alternatives to honest and byzantine. A correct node is an honest node that always eventually makes progress. A faulty node is a Byzantine node or an honest node that has crashed or will eventually crash. Note that honest and Byzantine
 are mutually exclusive, as are correct and faulty. However, a node can be both honest and faulty.
 \begin{mydef} {\bf (node)}.
     We call a single actor in the system node. In a computer network the computers are the nodes, in the classical client-server model both the server and the client are nodes, and so on.
 \end{mydef}
 \begin{mydef} {\bf (byzantine node)\footnote{Before the term \textit{byzantine} was coined, the terms Albanian Generals or Chinese Generals were used in order to describe malicious behavior. When the involved researchers met people from these countries they moved, for obvious reasons, to the historic term byzantine.}}.
+    \label{def:byzantine-node}
     A node which can have arbitrary behaviour is called byzantine. This includes \enquote{anything imaginable}, e.g., not sending any massage at all, or sending different and wrong messages to different neighbors, or lying about the input value.
 \end{mydef}
 
@@ -84,6 +85,7 @@ Distributed computer systems that want to be reliable must handle faulty compone
 
 \bigskip
 \begin{figure}[h]
+    \centering
 	\includegraphics[width=0.9\linewidth]{Images/byzantine.jpeg}
 	\caption{Conquest of Constantinople}
 	\label{fig:figure4}
