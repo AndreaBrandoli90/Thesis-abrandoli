@@ -4,7 +4,7 @@ Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system 
 
 \bigskip
 \noindent
-This chapter delves into the core innovation behind Bitcoin, i.e. \textit{Nakamoto consensus}, term that is commonly used to refer to Bitcoin's novel consensus mechanism, which allows mutually distrusting pseudonymous identities to reach eventual agreement.
+This chapter delves into the core innovation behind Bitcoin, i.e. \textit{Nakamoto consensus}, term that is commonly used to refer to Bitcoin's novel consensus mechanism, which allows mutually distrusting pseudonymous\footnote{Metti la nota sulla pseudonimity in Bitcoin} identities to reach eventual agreement.
 
 \bigskip
 \section{Eventual Consistency}
@@ -78,7 +78,7 @@ In Bitcoin, a coin or a \textit{bitcoin} is defined as a chain of digital signat
 
 \bigskip
 \noindent
-More precisely, each Tx\footnote{It's a common practice in Bitcoin community to abbreviate the word \textit{transaction} as Tx or sometimes TX.} output consists of an amount of bitcoins and a cryptographic puzzle, the so-called \textit{locking script}, which determines the spending conditions for that amount. An example of such a puzzle could be a request for a digital signature which can be validated with a public key. On the other side, a Tx input is characterized by a pointer referencing the UTXO that it consumes and an \textit{unlocking script}, the solution to the aforementioned locking script, which proves that funds in the considered transaction can be honestly spent.
+More precisely, each Tx\footnote{It's a common practice in Bitcoin community to abbreviate the word \textit{transaction} as Tx or sometimes TX.} output consists of an amount of bitcoins and a cryptographic puzzle, the so-called \textit{locking script}, which determines the spending conditions for that amount\footnote{Bitcoin uses a script system for transactions, called \textit{Script}. It is a simple language, Forth-like, processed from left to right using a stack. In addition, it is designed such that it guarantees all scripts will execute in a limited amount of time (i.e. it is not Touring-Complete).}. An example of such a puzzle could be a request for a digital signature which can be validated with a public key. On the other hand, a Tx input is characterized by a pointer referencing the UTXO that it consumes and an \textit{unlocking script}, the solution to the aforementioned locking script, which proves that funds in the considered transaction can be correctly spent.
 
 \bigskip
 \noindent
@@ -95,9 +95,10 @@ All the transactions, starting from the time the protocol was launched\footnote{
 \newpage
 \bigskip
 \noindent
-The aforementioned \textit{tamper-evidence} property derives from cryptography, so we must introduce some primitives. But first a bit of history. The ideas behind the blockchain trace back to a paper by Haber and Stornetta in 1991 \cite{Haber91howto}. They proposed a method to \textit{timestamp} digital documents, that is a method to give an idea of when a document came into exixtance. To achieve this goal, a timestamping server receives client documents to timestamp. Then it signs the documents (one by one) together with the current time, and a special type of pointer that links to a piece of data instead of a location, pointing to the previous document. Thus, if some data is tampered, that pointer turns to be invalid. Finally the timestamping server issues a certificate containing such information. Therefore it is clear that each document's certificate ensures the integrity of the previous document.
+The aforementioned \textit{tamper-evidence} property derives from cryptography, so we must introduce some primitives. But first a bit of history. The ideas behind the blockchain trace back to a paper by Haber and Stornetta in 1991 \cite{Haber91howto}. They proposed a method to \textit{timestamp} digital documents, that is a method to give an idea of when a document came into exixtance. To achieve this goal, a timestamping server receives client documents to timestamp. Then it signs the documents (one by one) together with the current time, and a special type of pointer that links to a piece of data instead of a location, pointing to the previous document. Thus, if some data is tampered, that pointer turns to be invalid. Finally the timestamping server issues a certificate containing such information. Therefore, it is clear that each document's certificate ensures the integrity of the previous document.
 
-\subsection{Hash Functions and Pointers}
+\subsection{Hash Functions}
+\label{sub:hash}
 The more the world becomes digital, the more we need information security. Cryptography mixes advanced mathematical and computer science techniques to provide confidentiality, data integrity, authentication and non-repudiation.
 
 \bigskip
@@ -113,7 +114,7 @@ A \textit{hash function} is a particular mathematical function that maps an arbi
 \noindent
 This definition lacks of security arguments. There are three main properties that hash functions need to possess in order to provide security:
 \begin{mydef}
-	\label{hash-prop}
+	\label{def:hash-prop}
 	Let $h$ be a hash function, the following properties may hold:
 	\begin{itemize}
 		\item preimage resistance (one-wayness): given $h(x)$ it is not feasible to compute $x$;
@@ -124,7 +125,7 @@ This definition lacks of security arguments. There are three main properties tha
 
 \bigskip
 \noindent
-A hash function that fulfills the preimage resistance property \textit{hides} the input, so one cannot derive a matching message from a hash value. A second-preimage resistant hash function prevents that, given a message, one can find another message that produces the same output once hashed. Unfortunately such a property cannot exist in theory, due to the so-called \textit{pigeonhole principle}\footnote{Formally this principle takes the name of \textit{Dirichlet's drawer principle}, but it is commonly referred to as the \textit{pigeonhole principle}.}. Suppose to be the owner of 100 pigeons but in your pigeon loop are only 99 holes, at least one pigeonhole will be occupied by 2 birds. The same argument holds for hash functions. Since the output of a hash function has a fixed bit length, say $n$ bits, there exist only $2^{n}$ possible output values. However the length of input values is arbitrary, resulting in an infinite number of possible inputs. Thus, weak collision can occur. Fortunately, given today's computers, an output length of $n=80$ bits is sufficient to prevent collisions. To sum up, collisions do exist, but they are \textit{unfeasible}. Finally, the strong collision resistance property refers to the problem of finding two messages that generate the same hash value. With an output length of $n=80$ bits as before, producing $2^{80}$ possible values, one may think that finding two inputs generating the same output would require around $\frac{2^{80}}{2}$, a half of the possible values. That's completely wrong, due to the \textit{birthday paradox}, a powerful cryptographic tool which deserves a formal definition.
+A hash function that fulfills the preimage resistance property \textit{hides} the input, so one cannot derive a matching message from a hash value. A second-preimage resistant hash function prevents that, given a message, one can find another message that produces the same output once hashed. Unfortunately such a property cannot exist in theory, due to the so-called \textit{pigeonhole principle}\footnote{Formally this principle takes the name of \textit{Dirichlet's drawer principle}, but it is commonly referred to as the \textit{pigeonhole principle}.}. Suppose to be the owner of 100 pigeons but in your pigeon loop are only 99 holes, at least one pigeonhole will be occupied by 2 birds. The same argument holds for hash functions. Since the output of a hash function has a fixed bit length, say $n$ bits, there exist only $2^{n}$ possible output values. However the length of input values is arbitrary, resulting in an infinite number of possible inputs. Thus, weak collision can occur in theory. Fortunately, given today's computers, an output length of $n=80$ bits is sufficient to resist an analytical attack, that is, given $x$ and $h(x)$ one wants to construct $y$ such that $h(y)=h(x)$. To sum up, collisions do exist, but they are \textit{unfeasible}. Finally, the strong collision resistance property refers to the problem of finding two messages that generate the same hash value. With an output length of $n=80$ bits as before, producing $2^{80}$ possible values, one may think that finding two inputs generating the same output would require around $\frac{2^{80}}{2}$, a half of the possible values. That's completely wrong, due to the \textit{birthday paradox}, a powerful cryptographic tool which deserves a formal definition.
 \begin{mydef} {\bf (birthday paradox)}.
     The birthday paradox concerns the probability that, given a set of $n$ randomly chosen people, some pair of them will have the same birthday.
 \end{mydef}
@@ -157,30 +158,85 @@ The search of a collision for a hash function is exactly the same problem as the
 Remind that we want to find how many messages are required to find a collision. Let $\lambda$ be the probability of at least one collision:
 $$\lambda \approx 1 - e^{- \frac{t(t-1)}{2^{n+1}}}$$
 Solving for $t$ and observing that, since in practice $t>>1$, it holds that $t^{2}\approx t(t-1)$ we obtain:
-$$t\approx 2^{(n+1)/2} \sqrt{\ln{\left(\frac{1}{1-\lambda}\right)}}$$
-The main takeaway of these computations is that the number of messages needed to find a collision of hash values is proportional to the square root of the number of possible output values.
+\begin{equation}
+    \label{eq:collision}
+    t\approx 2^{(n+1)/2} \sqrt{\ln{\left(\frac{1}{1-\lambda}\right)}}
+\end{equation}
+The main takeaway of the result obtained in Equation \ref{eq:collision} is that the number of messages needed to find a collision of hash values is proportional to the square root of the number of possible output values.
 
-\bigskip
-\noindent
-Riportare qui una tabellina coi valori, prendi da Pelzl and Paar (vedere per il titoletto delle sole colonne).
-
-\bigskip
-\noindent
 \begin{myexample}
-	SHA256 belongs to the family SHA2, the generation of hash functions following SHA1\footnote{Currently, it is available SHA3, which contains, among others, KECCAK256.}. It outputs  strings 256 bit long and, at the moment, it is considered to satisfy all the properties in Definition \ref{hash-prop}.
-	Several systems are built upon this assumption. 
-	In addition, as other hash functions, SHA256 could be modeled as a random oracle, a fixed input will provide always the same output, since hash functions are deterministic, but the outputs corresponding to new inputs will give results that are indistinguishable from a uniform distribution. 
-	Note how a little change in the input produces outputs very dissimilar in both hash functions, this feature helps to spot alterations in the inputs.
+	SHA256\textup{\footnote{SHA256 belongs to the SHA2 family. Nowadays SHA3 family is available, even more secure.}} (Secure Hash Algorithm) is the hash function the Bitcoin protocol is built upon. It produces a 256 bit output digest and, at the moment, it is considered to satisfy all the properties described in Definition \ref{def:hash-prop}.
+	Moreover, SHA256 could be thought as a random oracle, a fixed input will provide always the same output, since hash functions are deterministic, but the outputs corresponding to new inputs are indistinguishable from a uniform distribution. Thus, a small perturbation in the input string will result in a completely different digest.
 	\begin{verbatim}
-	SHA256(b'Hello World!\n') = 03ba204e50d126e4674c005e04d82e84c21
-	                            366780af1f43bd54a37816b6ab340
-	SHA256(b'Hello World\n')  = d2a84f4b8b650937ec8f73cd8be2c74add5
-	                            a911ba64df27458ed8229da804a26
+	SHA256("I love you")  = c33084feaa65adbbbebd0c9bf292a26ffc6
+	                        dea97b170d88e501ab4865591aafd
+	SHA256("I love you!") = c22fe0282c7b45b0926fb3e33efd375a5e1
+	                        95c4c838c96075e3877b2ac2b7911
 	\end{verbatim}
-	Since SHA256 is available, the use of SHA1 should be avoided unless there is a particular motivation. 
 \end{myexample}
 
+\subsection{Mining \& Proof of Work}
+\label{par:pow}
+The Bitcoin blockchain is a public distributed ledger of transactions. Being public means that anyone should be allowed to add transactions to the blockchain. However, we already saw that in a peer-to-peer asynchronous network like this, some nodes are byzantine and could be malevolent, trying to perform doublespends, which can result in an inconsistent state since the validity of transactions depends on the order in which they arrive, not the same for all nodes. Thus, if doublespends are not resolved, the shared state diverges. Hence, we need a mechanism to resolve conflicting transactions, the so-called \textit{proof-of-work}\footnote{The idea of \textit{proof-of-work} is taken from Adam Back's Hashcash \cite{Back02hashcash-}, a scheme to combat email spam proposed in 1997.}, in order to append only valid blocks to the blockchain.
+
+\begin{mydef}{\bf (proof-of-work)}.
+    \label{def:pow}
+    The proof-of-work (pow) is a mechanism allowing a party to prove to another party that a certain amount of computational power has been used for a period of time. A function $F_{d}(c,x) \rightarrow \{true,false\}$, where the difficulty $d$ is a positive number, while the challenge $c$ and the nonce $x$ are usually strings of bits, is a pow function if it satisfies the following properties:
+    \begin{enumerate}
+        \item if $d$, $c$ and $x$ are given, $F_{d}(c,x)$ is fast to compute.
+        \item For fixed $c$ and $d$, finding $x$ s.t. $F_{d}(c,x) = true$ is computationally hard but feasible. In addition, the difficulty $d$ serves to adjust the time to find that $x$.
+    \end{enumerate}
+\end{mydef}
+
 \bigskip
 \noindent
+However, the proof-of-work mechanism by itself does not fully solve the double-spending problem. But, if correctly used, it makes the blockchain tamper-resistant, thus extremely hard and expensive to rewrite. We will see how the proof-of-work is shaped in Bitcoin just in a while, inside the explanation of the network behaviour.
 
-Sistema l'esempio ed aggiungi hash pointers, poi la parte del mining, pow, network behaviour, supply e forks. Spiega dunque come Nakamoto risolve le main challenges nel costruire una moneta decentralizzata.
+\bigskip
+\noindent
+The clever intuition of Nakamoto in resolving doublespends is to incentivize network nodes to behave honestly, checking for and rejecting fraudolent transactions. The procedure by which new blocks are added to the blockchain while ensuring that they contain only valid transactions is called \textit{mining}. In addition, this procedure controls the rate of generation of new bitcoins. Before delving into the details of the mining procedure, we have to show a summary algorithm of the Bitcoin network behaviour, presented in the original white paper by Nakamoto \cite{nakamoto2012bitcoin}.
+
+\begin{algorithm}
+	\caption{Bitcoin network behaviour}
+	\label{alg:btc-network}
+	\begin{algorithmic}[1]
+		\State New transactions are broadcast to all nodes.
+		\State Each node collects new transactions into a block.
+		\State Each node works on finding a difficult proof-of-work for its block.
+		\State When a node finds a proof-of-work, it broadcasts the block to all nodes.
+		\State Nodes accept the block only if all transactions in it are valid and not already spent.
+		\State  Nodes express their acceptance of the block by working on creating the next block in the chain, using the hash of the accepted block as the previous hash.
+	\end{algorithmic}
+\end{algorithm}
+
+\bigskip
+\noindent
+Taking advantage of the main steps of the Bitcoin network behaviour described in Algorithm \ref{alg:btc-network}, we can proceed to define the mining procedure as a workflow:
+
+\begin{enumerate}
+    \item People performing bitcoin transactions will broadcast them onto the network. Such transactions will held in the \textit{mempool} (memory pool), that is a collection of pending transactions, before being included in a block. Each node of the network operate its own mempool, with its own unique size (typically MB).
+    \item Some special nodes, called \textit{miners}, collect some of these transactions into a \textit{candidate block}, which could be different for each miner, composed by a \textit{block header} and a list of transactions. The first transaction in the block is called \textit{coinbase transaction}. This special transaction has a dummy input, called \textit{coinbase}, with no references to parent TxOut, and creates new bitcoins from nothing. In addition, each transaction includes a small \textit{fee}, as the difference between inputs and outputs. Finally, the \textit{block header} consists of the following fields:
+    \begin{itemize}
+        \item A block version number.
+        \item The double SHA256 of the previous block header.
+        \item The \textit{merkleroot}\textup{\footnote{Fai riferimento quando lo spieghi meglio dopo}} of all transactions in that block.
+        \item The block generation time (Unix epoch time) according to the miner.
+        \item An encoded version (nBits) of the target threshold this block header hash must be less than or equal to.
+        \item The nonce used to effectively mine that block.
+    \end{itemize}
+    \item The sum of the transaction fees included in all regular transactions, plus the bitcoins generated in the coinbase transaction is called \textit{block reward}\textup{\footnote{The number of bitcoins generated by the coinbase transaction is determined by a subsidy schedule that is part of the protocol. Started with 50 bitcoins for every block, it halves every 210000 blocks (about 4 years, considering an average of a block per 10 minutes). Nowadays it consists of 12.5 bitcoins. Due to this halving, the total amount of bitcoins never exceeds 21 million of units, making this asset scarce by nature.}} and it is collected by the block's miner, allowing it to mint new coins. These economic incentives make Bitcoin a very expensive network, but they trigger a virtuous cycle\footnote{In an economic perspective, scarcity increases bitcoin market price.}, encouraging nodes to behave honestly competing to append valid blocks to the blockchain, making it almost immutable. So, each miner will compete to find that specific \textit{nonce} which verifies the Bitcoin proof-of-work. More precisely, recalling Definition \ref{def:pow}:
+    
+    \begin{mydef}{\bf (Bitcoin proof-of-work)}.
+        \label{def:btc-pow}
+        The Bitcoin proof-of-work consists of finding a special number $x$ called nonce s.t. the double SHA256 of the candidate block header falls below a given threshold\textup{\footnote{More precisely, the difficulty $d$ is calculated as: $d=\frac{\text{difficulty\_1\_target}}{\text{current\_target}}$. Traditionally, the \textit{difficulty\_1\_target} represents a hash where the leading 32 bits are zero and the rest are one, known as \textit{pool difficulty}, or \textit{pdiff}. Thus, the threshold value appears as $\frac{2^{224}}{d}$ and not $\frac{2^{256}}{d}$. In addition, the mining threshold is adaptively adjusted every 2016 blocks to achieve an average goal of a block 10 minutes (i.e. every 2 weeks).}}:
+        $$F_{d}(c,x) \rightarrow \text{SHA256}(\text{SHA256}(\underbrace{... \| \text{prev\_block\_header\_hash} \| ... \| x}_{\text{Candidate Block Header}})) < \frac{2^{224}}{d}$$
+    \end{mydef}
+    
+    \item The miner who first finds such a nonce will broadcast his own candidate block to the network. If all the transactions in that block pass the validity check, it is appended to the miner's local copy of the blockchain. Other nodes express their acceptance of the block by working on creating a new block using the hash of the accepted block as the previous hash. However, this is not the end of the story. It is possible that two miners mine their respective candidate blocks almost at the same time and, due to connection lag, they broadcast their blocks before being aware one of the other. This situation leads to a chain \textit{fork}, that is two possible valid chains, at least for the moment. The solution to this type of problem is achieved by the \textit{proof-of-work consensus}, i.e., in favor of the chain which required the most computational work\footnote{That is, with the majority of the network total hash rate working on it.} to produce.
+
+\end{enumerate}
+
+\bigskip
+\noindent
+Ora che abbiamo finalmente assemblato tutti i pezzi del puzzle sul consenso di nakamoto e che siamo convinti dell'immutabilit della blockchain di bitcoin entriamo nel cuore di questo lavoro di tesi, la marcatura temporale (o notarizzazione) di documenti digitali su blockchain. Nei due prossimi capitoli studieremo a fondo questo tema 
+
