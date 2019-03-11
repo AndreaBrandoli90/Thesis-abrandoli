@@ -107,7 +107,7 @@ Summing up, blockchain timestamping provides a public proof of existence of a di
 
 \bigskip
 \noindent
-A timestamp proof made with \textit{OpenTimestamps} consists in a list of commitment operations applied in sequence to the document, ending with one or more time attestations. In fact, such a list of operations is actually a tree of operations, with the document as the root, the commitment operations as the edges and time attestations as the leaves. Anyone can easily verify the proof just replaying the operations and checking that the final result is a message that you already know existed at a certain time. Since commitment operations grant that different inputs will always result in different outputs, we are sure that there is no way to change the original document without invalidating the proof.
+A timestamp proof made with \textit{OpenTimestamps} consists in a list of commitment operations applied in sequence to the document, ending with one or more time attestations. Such a list of operations is actually a tree of operations, with the document as the root, the commitment operations as the edges and time attestations as the leaves. Anyone can easily verify the proof just replaying the operations and checking that the final result is a message that you already know existed at a certain time. Since commitment operations grant that different inputs will always result in different outputs, we are sure that there is no way to change the original document without invalidating the proof.
 
 \bigskip
 \subsection{Solving Scalability Problem}
@@ -123,15 +123,15 @@ As we mentioned before, \textit{OpenTimestamps} proposes a solution to the scala
 
 \bigskip
 \noindent
-In addition to this, \textit{OpenTimestamps} comes with a system of \textit{aggregation servers}\textup{\footnote{Examples of public \textit{aggregation servers} are: \url{a.pool.opentimestamps.org} and \url{b.pool.opentimestamps.org}.}}, publicly available \enquote{meeting points}, where anyone can submit a digest to be timestamped, as Peter Todd said in \cite{OTSannouncment}. As its name suggests, an aggregation server collects documents' hash values in a pending list of digests and periodically \textit{aggregates} these digests into a single merkle tree. Notice that the aggregation server learns nothing about the original documents, it only collects \enquote{meaningless} digests. In addition each file is protected by a nonce, thus files are not directly connected in any way. Then, the root of that tree is timestamped with Bitcoin. But there is a little price to pay, aggregation servers are obviously centralized and represent single points of failure because they could go offline, stopping the service. However this represents just a little inconvenience, aggregation servers remain \textit{trustless} in the sense that they cannot tamper a proof, because it is Bitcoin and not theirselves to provide the validity of a timestamp.
+In addition to this, \textit{OpenTimestamps} comes with a system of \textit{aggregation servers}\textup{\footnote{Examples of public \textit{aggregation servers} are: \url{a.pool.opentimestamps.org} and \url{b.pool.opentimestamps.org}.}}, publicly available \enquote{meeting points}, where anyone can submit a digest to be timestamped, as Peter Todd said in \cite{OTSannouncment}. As its name suggests, an aggregation server collects documents' hash values in a pending list of digests and periodically \textit{aggregates} these digests into a single merkle tree. Notice that the aggregation server learns nothing about the original documents, it only collects \enquote{meaningless} digests\footnote{In the sense that there is no way to retrieve the original document from its hash value.}. In addition each file is protected by a nonce, thus files are not directly connected in any way. Then, the root of that tree is timestamped with Bitcoin. But there is a little price to pay, aggregation servers are obviously centralized and represent single points of failure because they could go offline, stopping the service. However this represents just a little inconvenience, aggregation servers remain \textit{trustless} in the sense that they cannot tamper a proof, because it is Bitcoin and not theirselves to provide the validity of a timestamp.
+
+\newpage
+\noindent
+The real downside is that aggregation servers are extremely efficient but not convenient. To obtain a proof, even if for more documents at once, you have to wait for the transaction committing to the document to confirm, that is 10 minutes on average if it is included in the next block. That is too much time in many cases, for example in a timestamped e-mails exchange.
 
 \bigskip
 \noindent
-The real downside is that aggregation servers are extremely efficient but not convenient. To obtain a proof, even if for more documents at once, you have to wait for the transaction committing to the document to confirm, that is 10 minutes on average if it is included in the next block. That is too much time in many cases, for example in a timestamped e-mail exchange.
-
-\bigskip
-\noindent
-But there is a compromise to address this problem which allows any user to receive such proof almost instantly: \textit{public calendar servers}. A \textit{calendar server} grants remote access to a \textit{calendar}, a collection of timestamps. Calendar servers and aggregation servers work in conjunction: rather than timestamping the tip\footnote{We use the word \textit{tip} as a synonym of \textit{root}, hence whenever the word \textit{merkletip} will appear, it indicates the root of that merkle tree.} of the merkle tree of digests directly with Bitcoin, aggregation servers aggregate pending digests in a one second interval into a merkle tree and submit the tip of that tree to a public calendar server. The latter makes the promise that every submitted merkletip will be timestamped by the Bitcoin blockchain in a reasonable amount of time, and keeps indefinitely all completed timestamps, publicly available in every moment. Hence, the proof is generated in about one second. Obviously, the inconvenience here is that public calendar servers are, as aggregation servers before, a central point of failure. In fact, a proof made with the aid of a calendar server (public or private) is called \textit{incomplete}. However, once the Bitcoin blockchain has definitely completed the timestamp, such incomplete proof can be \textit{upgraded}, adding the path up to the block header merkletip, but we will go into details later in this chapter. Algorithm \ref{alg:calendar-working}, a slight modification of the one proposed by L. Comandini in his master thesis work \cite{Comandini:Thesis:2018}, perfectly describes how calendar and aggregation servers cooperate.
+But there is a compromise to address this problem which allows any user to receive such proof almost instantly: public \textit{calendar servers}. A \textit{calendar server} grants remote access to a \textit{calendar}, a collection of timestamps. Calendar servers and aggregation servers work in conjunction: rather than timestamping the tip\footnote{We use the word \textit{tip} as a synonym of \textit{root}, hence whenever the word \textit{merkletip} will appear, it indicates the root of that merkle tree.} of the merkle tree of digests directly with Bitcoin, aggregation servers aggregate pending digests in a one second interval into a merkle tree and submit the tip of that tree to a public calendar server. The latter makes the promise that every submitted merkletip will be timestamped by the Bitcoin blockchain in a reasonable amount of time, and keeps indefinitely all completed timestamps, publicly available in every moment. Hence, the proof is generated in about one second. Obviously, the inconvenience here is that public calendar servers are, as aggregation servers before, a central point of failure. In fact, a proof made with the aid of a calendar server is called \textit{incomplete}. However, once the Bitcoin blockchain has definitely completed the timestamp, such incomplete proof can be \textit{upgraded}, adding the path up to the block header merkletip, but we will go into details later in this chapter. Algorithm \ref{alg:calendar-working}, a slight modification of the one proposed by L. Comandini in his master thesis work \cite{Comandini:Thesis:2018}, perfectly describes how calendar and aggregation servers cooperate.
 
 \begin{algorithm}
 	\caption{Cooperation between aggregation and calendar servers}
@@ -152,17 +152,13 @@ But there is a compromise to address this problem which allows any user to recei
 \end{algorithm}
 \footnotetext{The term \textit{aggregator} stands for aggregation server.}
 
-\bigskip
+\newpage
 \noindent
-Manca la parte del replace-by-fee e di quanto si spende a mantedere un calendar server
+One last question needs to be answered: who really pays for the transactions in which digests to be timestamped are pushed in? A calendar spends bitcoins from its own wallet, making \textit{replace-by-fee}\textup{\footnote{In Bitcoin, unconfirmed transactions (yet in the mempool) can be modified and re-issued with higher fees for the miners. This leads to a higher probability for that transaction to be mined.}} transactions in order to spend a fixed amount each day. Briefly, the calendar makes a transaction with the lowest possible fees, recursively increasing that amount by a parameter $a$, fixed by who effectively runs the calendar server, until the transaction enters in a block. This result in a fixed amount of $144 \cdot a$ fees spent by the calendar each day, counting a block every 10 minutes on average. It could happen that some timestamps takes too long to be completed, a price that a user willingly pay for a service that allows completely free timestamping.
 
 \bigskip
 \noindent
 What remains to be done is to learn how to practically timestamp a document with \textit{OpenTimestamps}, which provides users multiple and easy way to create and independently verify timestamps, directly from the official web page \cite{OTSWeb} or with command-line tools. We will now provide a step-by-step guide to use both the web page and the Python version of the client\footnote{\textit{OpenTimestamps} client comes in many programming languages: Python, Java, JavaScript and Rust. Here we present only the Python version because the main reference library of the project is written in Python.}.
-
-\bigskip
-\section{OpenTimestamps web interface}
-Spiega come funziona la pagina web con il difetto che non ci si possa connettere ad un nodo locale tramite interfaccia web, perdento la totale decentralizzazione garantita invece utilizzando un client. Fai gli screen delle immagini.
 
 \bigskip
 \section{OpenTimestamps Python client}
@@ -269,6 +265,36 @@ Now that we know for sure that timestamping succeeded, you only left to use the 
  Success! Bitcoin block 560604 attests existence as of 2019-01-29 CET
 \end{lstlisting}
 \end{itemize}
+
+\bigskip
+\section{OpenTimestamps web interface}
+Rather than the more complicated client, the easiest way to perform a timestamp with \textit{OpenTimestamps} is using the web interface on the official website \cite{OTSWeb}. It obviously allows the same actions as the client does, just interacting with the \enquote{Stamp \& Verify} box. Simply, drop a file in the box to \textit{stamp} it and the service will automatically download its proof, named as the file is with a \colorbox{light-gray}{.ots} extension. The hash of the document will be calculated inside your browser, thus not requiring the user to distribute his original document to any third party, preserving privacy.
+
+\bigskip
+\begin{figure}[htbp]
+    \centering
+	\includegraphics[width=1\linewidth]{Images/stamping.png}
+	\caption{Stamping}
+	\label{fig:ots-stamping}
+\end{figure}
+
+\newpage
+\noindent
+Alternatively, you can drop a \colorbox{light-gray}{.ots} file to \textit{verify}. Here the underlying code will detect if the file is yet in the \textit{incomplete} state and performs an \textit{upgrade}, automatically downloading the upgraded proof file. Otherwise, if the timestamp is already completed, it verifies such proof. Notice that the original document is required to start the verification process.
+
+\bigskip
+\begin{figure}[htbp]
+    \centering
+	\includegraphics[width=1\linewidth]{Images/verify.png}
+	\caption{Verifying}
+	\label{fig:ots-verifying}
+\end{figure}
+
+\bigskip
+\noindent
+However, the web interface comes with a downside. Browsers applications like this one have some security restrictions, inhibiting a direct access to the local Bitcoin configuration file\footnote{We refer to Appendix \ref{app:A} for more details.}, thus preventing a user to make RPC calls to his own local Bitcoin node in order to verify a timestamp proof. Hence a user must trust the public block explorers that \textit{OpenTimestamps} uses to verify such proof. Summing up, verification is not fully decentralized. Finally, clicking the \textit{info} button in the low right corner will open a new web page that parse the proof in a nice representation (like the \colorbox{light-gray}{info} command does for the client version, but with some added graphics).
+
+
 
 
 
