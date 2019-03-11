@@ -219,7 +219,7 @@ Taking advantage of the main steps of the Bitcoin network behaviour described in
     \begin{itemize}
         \item A block version number.
         \item The double SHA256 of the previous block header.
-        \item The \textit{merkleroot}\textup{\footnote{Fai riferimento quando lo spieghi meglio dopo}} of all transactions in that block.
+        \item The \textit{merkleroot}\textup{\footnote{A \textit{merkleroot} is the root of a \textit{merkle tree} as presented in Definition \ref{def:merkle}.}} of all transactions in that block.
         \item The block generation time (Unix epoch time) according to the miner.
         \item An encoded version (nBits) of the target threshold this block header hash must be less than or equal to.
         \item The nonce used to effectively mine that block.
@@ -238,5 +238,4 @@ Taking advantage of the main steps of the Bitcoin network behaviour described in
 
 \bigskip
 \noindent
-Ora che abbiamo finalmente assemblato tutti i pezzi del puzzle sul consenso di nakamoto e che siamo convinti dell'immutabilit della blockchain di bitcoin entriamo nel cuore di questo lavoro di tesi, la marcatura temporale (o notarizzazione) di documenti digitali su blockchain. Nei due prossimi capitoli studieremo a fondo questo tema 
-
+We set the basis for the very hearth of this thesis work, that is \textit{notarization} of digital documents with the Bitcoin blockchain. In Chapter \ref{chpr:notarization} we will study what a \textit{timestamp} on the blockchain is, introducing \textit{OpenTimestamps}, an open-source project whose aim is to be a standard for blockchain notarization. Then, in Chapter \ref{chpr:project} we will delve into the details of a project in which the author, in cooperation with DGI (Digital Gold Institute) and ANIA (Associazione Nazionale fra le Imprese Assicuratrici), built a fully operating timestamping service, modifying and extending the \textit{OpenTimestamps} protocol on the basis of need.

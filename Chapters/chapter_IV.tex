@@ -1,4 +1,5 @@
 \chapter{Blockchain Notarization with OpenTimestamps}
+\label{chpr:notarization}
 
 We devoted Chapter \ref{chpr:consensus} and Chapter \ref{chpr:btc} in understanding how Bitcoin achieves distributed consensus, thus convincing ourselves that the relative blockchain is, in geek speak, \textit{immutable}. We made this effort to lay the foundations for one of the most interesting non-monetary application\footnote{Behind the hype for the blockchain in the current years as the definitive solution of all the world's problems, notarization of digital documents stands out as one of the few real applications of this technology.} of the blockchain, that is the \textit{notarization} of digital documents. According to National Notary Association\footnote{More details in the official website: \url{https://www.nationalnotary.org/knowledge-center/about-notaries/what-is-notarization}.}:
 
@@ -292,7 +293,7 @@ Alternatively, you can drop a \colorbox{light-gray}{.ots} file to \textit{verify
 
 \bigskip
 \noindent
-However, the web interface comes with a downside. Browsers applications like this one have some security restrictions, inhibiting a direct access to the local Bitcoin configuration file\footnote{We refer to Appendix \ref{app:A} for more details.}, thus preventing a user to make RPC calls to his own local Bitcoin node in order to verify a timestamp proof. Hence a user must trust the public block explorers that \textit{OpenTimestamps} uses to verify such proof. Summing up, verification is not fully decentralized. Finally, clicking the \textit{info} button in the low right corner will open a new web page that parse the proof in a nice representation (like the \colorbox{light-gray}{info} command does for the client version, but with some added graphics).
+However, the web interface comes with a downside. Browsers applications like this one have some security restrictions, inhibiting a direct access to the local Bitcoin configuration file\footnote{We refer to Appendix \ref{app:A} for more details.}, thus preventing a user to make RPC calls to his own local Bitcoin node in order to verify a timestamp proof. Hence a user must trust the public block explorers that \textit{OpenTimestamps} uses to verify such proofs. Summing up, verification is not fully decentralized. Finally, clicking the \textit{info} button in the low right corner will open a new web page that parse the proof in a nice representation (like the \colorbox{light-gray}{info} command does for the client version, but with some added graphics).
 
 
 
