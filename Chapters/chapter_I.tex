@@ -1,3 +1,18 @@
 \chapter{Introduction}
 \label{chpr:intro}
 
+\section{Thesis Structure}
+In Chapter \ref{chpr:consensus} we will start presenting the consensus problem in distributed systems: first we will define what a distributed system is and the main reasons in adopting it (Section \ref{sec:distributed-systems}). Then we will get into the consensus problem (Section \ref{sec:consensus-problem}), in particular in the case of an asynchronous network in presence of byzantine (malicious) nodes (Sections \ref{sec:byzantine-generals} and \ref{sec:byzantine-agreement}), also showing a famous impossibility result (Section \ref{sec:impossibility-result}) in that specific case.
+
+\bigskip
+\noindent
+Chapter \ref{chpr:btc} will delve into the Bitcoin's novel consensus mechanism. We initially think of Bitcoin as an example of eventual consistency, to focus the Nakamoto's clever intuition of relaxing some properties in the definition of consensus to hold only probabilistically (Section \ref{sec:eventual-consistency}). Then we will give an overview of
+the main building blocks of the Bitcoin protocol (Section \ref{sec:btc-design}), with a particular interest for the underlying blockchain as a tamper-evident append-only log (Section \ref{sec:transaction-blockchain}). All this effort to completely understand how Nakamoto practically solves the consensus problem in Bitcoin and why this notorious blockchain is immutable.
+
+\bigskip
+\noindent
+The first two Chapters set the basis for the core of this thesis work, that is one of the few real non-monetary applications of the blockchain technology: notarization of digital documents, presented in Chapter \ref{chpr:notarization}. More specifically we will define what a timestamp is and how the timestamping procedure works (Section \ref{sec:timestamping}). We will also introduce \textit{OpenTimestamps}, an open-source project that aims to be a standard for blockchain timestamping (Section \ref{sec:ots}), providing a step-by-step tutorial of the usage of its main releases (Sections \ref{sec:ots-client} and \ref{sec:ots-web}).
+
+\bigskip
+\noindent
+Finally, in Chapter \ref{chpr:project}...

@@ -17,6 +17,7 @@ However, a central authority represents a single point of failure. Who maintains
 
 \bigskip
 \section{Blockchain Timestamping}
+\label{sec:timestamping}
 A timestamp can be seen as a sequence of characters representing the time in which an event occurred. Hence, timestamping is an increasingly valuable complement to digital signing practices, enabling organizations to record when a digital item, such as a message, document, transaction or piece of software, was signed. In addition, the timing of a digital signature is critical in many cases, like lottery ticket issuance and some legal proceedings. Even when time is not intrinsic to the application, timestamping is helpful for record keeping and audit processes, because it proves whether the digital certificate was valid at the time it was used. More precisely:
 
 \begin{mydef}{\bf (timestamp)}.
@@ -34,7 +35,7 @@ can be publicly observed. So a proof consists in the data $d$, the set of operat
 
 \bigskip
 \noindent
-Recalling Definition \ref{def:hash-prop}, requiring a function to be a \textit{commitment} operation is the same to require that function to fulfill \textit{second-preimage resistance}, a property already seen in Paragraph \ref{sub:hash} for hash functions. We will now provide some simple examples of commitment operations in order to understand better, the \enquote{\textit{append}} and \enquote{\textit{prepend}} operations.
+Recalling Definition \ref{def:hash-prop}, requiring a function to be a \textit{commitment} operation is the same to require that function to fulfill \textit{second-preimage resistance}, a property already seen in Paragraph \ref{sec:hash} for hash functions. We will now provide some simple examples of commitment operations in order to understand better, the \enquote{\textit{append}} and \enquote{\textit{prepend}} operations.
 \begin{myexample}{\bf (\enquote{append})}.
     \textquotedblleft hello\textquotedblright $\xrightarrow{\text{append(\textquotedblleft world\textquotedblright)}}$ \textquotedblleft helloworld\textquotedblright.
 \end{myexample}
@@ -48,7 +49,7 @@ It is clear that these commitment operations bind inputs to outputs, thus making
 
 \bigskip
 \noindent
-To address these issues, we need a tailored commitment operation that fits our case, that is the \textit{hash function}. As we already saw in Paragraph \ref{sub:hash}, hash functions achieve specific properties:
+To address these issues, we need a tailored commitment operation that fits our case, that is the \textit{hash function}. As we already saw in Paragraph \ref{sec:hash}, hash functions achieve specific properties:
 \begin{itemize}
     \item The same input data $d$ will always yield the same hash value.
     \item The hash value is always of a fixed length\footnote{Accordingly to the Bitcoin protocol, we will use SHA256, resulting in a 256-bits output length.}, no matter what size of the input data $d$.
@@ -70,7 +71,7 @@ Once the hash value is computed, it can be associated to a particular Bitcoin tr
 \begin{verbatim}
 Pubkey Script: OP_RETURN <0 to 80 bytes of data>
 \end{verbatim}
-This \textit{null data script} cannot be spent, so there is not an associated \textit{unlocking script}. Then, the aforementioned transaction is broadcast to the network, waiting for a miner to add it in the transaction set of a mined block. We already saw that a block header contains a specific field called \textit{merkleroot} when we talked about mining in Paragraph \ref{par:pow}, substantially the root of a binary tree that summarize all the transactions in that block or, in other words, a \textit{commitment} to them. We will use this tree structure, called \textit{merkle tree}\textup{\footnote{The name \textit{merkle tree} comes from Ralph Merkle, who patented it in 1979.}}, in the next chapters, thus we will give here a brief explanation:
+This \textit{null data script} cannot be spent, so there is not an associated \textit{unlocking script}. Then, the aforementioned transaction is broadcast to the network, waiting for a miner to add it in the transaction set of a mined block. We already saw that a block header contains a specific field called \textit{merkleroot} when we talked about mining in Paragraph \ref{sec:mining-pow}, substantially the root of a binary tree that summarize all the transactions in that block or, in other words, a \textit{commitment} to them. We will use this tree structure, called \textit{merkle tree}\textup{\footnote{The name \textit{merkle tree} comes from Ralph Merkle, who patented it in 1979.}}, in the next chapters, thus we will give here a brief explanation:
 
 \begin{mydef}{\bf (merkle tree)}.
     \label{def:merkle}
@@ -162,7 +163,8 @@ One last question needs to be answered: who really pays for the transactions in 
 What remains to be done is to learn how to practically timestamp a document with \textit{OpenTimestamps}, which provides users multiple and easy way to create and independently verify timestamps, directly from the official web page \cite{OTSWeb} or with command-line tools. We will now provide a step-by-step guide to use both the web page and the Python version of the client\footnote{\textit{OpenTimestamps} client comes in many programming languages: Python, Java, JavaScript and Rust. Here we present only the Python version because the main reference library of the project is written in Python.}.
 
 \bigskip
-\section{OpenTimestamps Python client}
+\section{OpenTimestamps Python Client}
+\label{sec:ots-client}
 \textit{OpenTimestamps} client is a command-line\footnote{Here we are supposing a Unix-based operative system.} tool to create and validate timestamp proofs, with the Bitcoin blockchain as a notary. This section is aimed to be a step-by-step tutorial to fully manage the Python release of this client\footnote{The presented guide refers to the Git repository \textit{opentimestamps-client} from the \textit{OpenTimestamps} source code \cite{OpenTimestampsGithub}.}.
 
 \bigskip
@@ -268,7 +270,8 @@ Now that we know for sure that timestamping succeeded, you only left to use the 
 \end{itemize}
 
 \bigskip
-\section{OpenTimestamps web interface}
+\section{OpenTimestamps Web Interface}
+\label{sec:ots-web}
 Rather than the more complicated client, the easiest way to perform a timestamp with \textit{OpenTimestamps} is using the web interface on the official website \cite{OTSWeb}. It obviously allows the same actions as the client does, just interacting with the \enquote{Stamp \& Verify} box. Simply, drop a file in the box to \textit{stamp} it and the service will automatically download its proof, named as the file is with a \colorbox{light-gray}{.ots} extension. The hash of the document will be calculated inside your browser, thus not requiring the user to distribute his original document to any third party, preserving privacy.
 
 \bigskip
