@@ -3,6 +3,7 @@
 
 \bigskip
 \section{Distributed Systems}
+\label{sec:distributed-systems}
 With the persistent expansion of technology in the digital age we are going through, distributed systems are becoming more and more widespread.
 
 \bigskip
@@ -36,16 +37,17 @@ Therefore, the main reasons for using distributed systems are:
 However, beautiful features like these often have a downside, bringing to light some challenging problems:
 \begin{itemize}
     \item Security: Especially when networks are public.
-    \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or Blockchain.}: In public distributed systems coordination problems are prevalent if proper protocols or policies are not in place; agents could be malevolent or malicious.
+    \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or blockchain.}: In public distributed systems coordination problems are prevalent if proper protocols or policies are not in place; agents could be malevolent or malicious.
 \end{itemize}
 Thus, it can be easily inferred that one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, clock synchronization, PageRank, load balancing and many others. Let us get in a detailed study of what consensus is and how consensus can be achieved in a distributed system.
 
 \bigskip
-\section[The Consensus Problem]{The Consensus Problem\footnote{Definitions and Algorithms presented in this section are taken from \cite{Wattenhofer:2016:SB:3002702}, a book in which the author deeply delves into the problem of achieving consensus in distributed systems.}} 
-Networks are composed by many agents, called \textit{nodes}. Think of a computer network, nodes are either \textit{honest}, executing programs faithfully, or \textit{byzantine} \cite{Lamport:1982:BGP:357172.357176}, exhibiting arbitrary behavior. We will also define them \textit{correct} and \textit{faulty}, but not as alternatives to honest and byzantine. A correct node is an honest node that always eventually makes progress. A faulty node is a Byzantine node or an honest node that has crashed or will eventually crash. Note that honest and Byzantine
+\section[The Consensus Problem]{The Consensus Problem\footnote{Definitions and Algorithms presented in this section are taken from \cite{Wattenhofer:2016:SB:3002702}, a book in which the author deeply delves into the problem of achieving consensus in distributed systems.}}
+\label{sec:consensus-problem}
+Networks are composed by many agents, called \textit{nodes}. Think of a computer network, nodes are either \textit{honest}, executing programs faithfully, or \textit{byzantine} \cite{Lamport:1982:BGP:357172.357176}, exhibiting arbitrary behavior. They can also be \textit{correct} and \textit{faulty}, but not as alternatives to honest and byzantine. A correct node is an honest node that always eventually makes progress. A faulty node is a byzantine node or an honest node that has crashed or will eventually crash. Notice that the terms honest and byzantine
 are mutually exclusive, as are correct and faulty. However, a node can be both honest and faulty.
 \begin{mydef} {\bf (node)}.
-    We call a single actor in the system node. In a computer network the computers are the nodes, in the classical client-server model both the server and the client are nodes, and so on.
+    A single actor in the system is called node. In a computer network the computers are the nodes, in the classical client-server model both the server and the client are nodes, and so on.
 \end{mydef}
 \begin{mydef} {\bf (byzantine node)\footnote{Before the term \textit{byzantine} was coined, the terms Albanian Generals or Chinese Generals were used in order to describe malicious behavior. When the involved researchers met people from these countries they moved, for obvious reasons, to the historic term byzantine.}}.
     \label{def:byzantine-node}
@@ -56,9 +58,7 @@ are mutually exclusive, as are correct and faulty. However, a node can be both h
 \noindent
 We assume that each pair of nodes is connected by a link, which is a bi-directional reliable virtual circuit
 and therefore messages sent on this link are delivered, eventually, and in the order in which they were sent
-(i.e., an honest sender keeps retransmitting a message until it receives an acknowledgment or crashes). A
-receiver can tell who sent a message (e.g., using MACs), so a Byzantine node cannot forge a message so it
-is indistinguishable from a message sent by an honest node.
+(i.e., a sender keeps re-transmitting a message until it receives an acknowledgment or crashes). A receiver can tell who sent a message, thus a message cannot be forged. Standing the above consideration, a message sent by a byzantine node is indistinguishable from a message sent by an honest node.
 
 \bigskip
 \noindent
@@ -81,6 +81,7 @@ What is really interesting is to learn how to achieve distributed consensus in a
 
 \bigskip
 \subsection{The Byzantine Generals' Problem}
+\label{sec:byzantine-generals}
 Distributed computer systems that want to be reliable must handle faulty components that give conflicting information to different parts of the system.
 
 \bigskip
@@ -88,14 +89,13 @@ Distributed computer systems that want to be reliable must handle faulty compone
     \centering
 	\includegraphics[width=0.9\linewidth]{Images/byzantine.jpeg}
 	\caption{Conquest of Constantinople}
-	\label{fig:figure4}
+	\label{fig:generals}
 	\source{\url{https://medium.com/all-things-ledger/the-byzantine-generals-problem-168553f31480}}
 \end{figure}
 
 \bigskip
 \noindent
-The \enquote{Byzantine Generals' Problem} is the abstraction of the aforementioned situation.
-We imagine that several divisions of the Byzantine army are camped outside an enemy city, each division commanded by its own general. The generals communicate with one another as well as with all lieutenants only by messenger. After observing the enemy, they must decide upon a common plan of action: the exact time to attack all at once or, if faced by fierce resistance, the time to retreat all at once. The army cannot hold on forever, if the attack or retreat is without full strength then brutal defeat is the only possible outcome. However, some of the generals may be traitors, trying to prevent loyal generals from reaching agreement. 
+The \enquote{Byzantine Generals' Problem} is the abstraction of the aforementioned situation. As in Figure \ref{fig:generals}, we imagine that several divisions of the Byzantine army are camped outside an enemy city, each division commanded by its own general. The generals communicate with one another as well as with all lieutenants only by messenger. After observing the enemy, they must decide upon a common plan of action: the exact time to attack all at once or, if faced by fierce resistance, the time to retreat all at once. The army cannot hold on forever, if the attack or retreat is without full strength then brutal defeat is the only possible outcome. However, some of the generals may be traitors, trying to prevent loyal generals from reaching agreement. 
 
 \bigskip
 \noindent
@@ -111,6 +111,7 @@ For simplicity, we can restrict ourselves to the case of a commanding general se
 
 \bigskip
 \subsection{Byzantine Agreement}
+\label{sec:byzantine-agreement}
 Achieving consensus (as in Definition \ref{def:consensus}) in a system with byzantine nodes is hard stuff. A careful reader immediately realizes that fulfilling agreement and termination is straight-forward, but what about validity? Reminding that a byzantine node can be malevolent lying about its input value, we must specify different types of validity:
 \begin{mydef}{\bf (any-input validity)\footnote{This is the validity definition we implicitly used for consensus, in Definition \ref{def:consensus}}}.
     The decision value must be the proposed value of any node.
@@ -121,7 +122,7 @@ As we can see, this definition does not still make sense in presence of byzantin
     The decision value must be the proposed value of a correct node.
 \end{mydef}
 \noindent
-Fulfilling this particular validity definition is not so simple, as byzantine nodes following correctly a specified protocol but lying about theirs input values are indistinguishable from correct nodes. An alternative could be:
+Achieving this particular validity definition is not so simple, as byzantine nodes following correctly a specified protocol but lying about theirs input values are indistinguishable from correct nodes. An alternative could be:
 \begin{mydef}{\bf (all-same validity)}.
     If all correct nodes start with the same proposed value $v$, the decision value must be $v$.
 \end{mydef}
@@ -230,6 +231,7 @@ Unfortunately, Algorithm \ref{alg:ben-or} is just a proof of concept that asynch
 
 \bigskip
 \subsection{Impossibility Result}
+\label{sec:impossibility-result}
 A solution to the Byzantine Generals' Problem \ref{def:bgp} may seem a piece of cake. That's not true at all. Its difficulty arises from the fact that if the generals can send only oral messages, then no solution will work unless more than two-thirds of the generals are loyal. An oral message is one whose contents are completely under the control of the sender, so a traitorous sender can transmit any possible message.
 Such a message corresponds to the type of message that computers normally send to one another.
 

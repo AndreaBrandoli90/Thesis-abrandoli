@@ -1,13 +1,14 @@
 \chapter{Nakamoto Consensus in Bitcoin}
 \label{chpr:btc}
-Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his author Satoshi Nakamoto\footnote{The name Satoshi Nakamoto is the pseudonym adopted by the creator of Bitcoin. While his identity remains a mystery, some information is known. He registered the domain bitcoin.org in August 2008 and in October 2008 he publicly released the famous white paper. In the Bitcoin's early days he participated extensively in forums and mailing lists maintaining the souce code. During the next two years other contributors slowly taken over the project maintenance and he stopped communicating, leaving a veil of mystery.}, it lacked a formalization of the protocol and of the guarantees it claimed to provide.
+Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his author Satoshi Nakamoto\footnote{The name Satoshi Nakamoto is the pseudonym adopted by the creator of Bitcoin. While his identity remains a mystery, some information is known. He registered the domain bitcoin.org in August 2008 and in October 2008 he publicly released the famous white paper. In the Bitcoin's early days he participated extensively in forums and mailing lists maintaining the souce code. During the next two years other contributors slowly taken over the project maintenance and he stopped communicating, leaving a veil of mystery.} \cite{nakamoto2012bitcoin}, it lacked a formalization of the protocol and of the guarantees it claimed to provide.
 
 \bigskip
 \noindent
-This chapter delves into the core innovation behind Bitcoin, i.e. \textit{Nakamoto consensus}, term that is commonly used to refer to Bitcoin's novel consensus mechanism, which allows mutually distrusting pseudonymous\footnote{Metti la nota sulla pseudonimity in Bitcoin} identities to reach eventual agreement.
+This chapter delves into the core innovation behind Bitcoin, i.e. \textit{Nakamoto consensus}, term that is commonly used to refer to Bitcoin's novel consensus mechanism, which allows mutually distrusting pseudonymous\footnote{Agents in the bitcoin network play under a pseudonym, that is the \textit{address} to which they receive transactions. As specified in the original white paper \cite{nakamoto2012bitcoin}, Bitcoin users are recommended to use a new address for each transaction in order to avoid that many transactions are connected to a common owner, leading anonymity.} identities to reach eventual agreement.
 
 \bigskip
 \section{Eventual Consistency}
+\label{sec:eventual-consistency}
 By its very nature, the Bitcoin network is subject to a type of failure called \textit{network partition}, where a network splits into at least two parts that cannot communicate with each other, often due to software bugs, incompatible protocol versions, or simply network disconnections.
 Thus, Bitcoin is inherently characterized by a trade-off between \textit{consistency}, \textit{availability} and \textit{partition tolerance}. Let us be more precise.
 \begin{mydef} {\bf (consistency)}.
@@ -47,10 +48,12 @@ Now that we have clear in mind the consensus problem from a computer science per
 
 \bigskip
 \section{Bitcoin Design}
+\label{sec:btc-design}
 We already defined Bitcoin as a distributed, decentralized, peer-to-peer electronic payment system, but we lacked about defining the underlying digital asset, i.e. \textit{bitcoin}, the challenges in building it, and also the fundamental bricks of the Bitcoin wall. Combining all these aspects is crucial to fully understand Nakamoto consensus.
 
 \bigskip
 \subsection{Constructing a Decentralized Digital Currency}
+\label{sec:decentralized-currency}
 \textit{Ownership} is the first challenge of constructing a virtual currency. Imagine units of fiat currencies, their ownership depends on their form. If these units are in the form of paper notes or metal coins, ownership is simply determined by physical possession. Else, if these units are digitally stored in a bank account, ownership is determined by possession of the credentials to spend them. But what about ownership for a decentralized virtual currency? Who maintains the ledger of credentials? How can we guarantee the integrity of that ledger? In a network like Bitcoin nodes are free to leave at any time, thus a single source of trust (a node or a group of them) cannot be given this responsibility, even if one-way functions protects credentials. A solution could be that all nodes maintain a copy of that ledger, but what about validation? Can I feasible query all the nodes? Integrity is also crucial: usually digital signatures ensure it, but reminds the nodes could act maliciously and so, can I trust the signer?
 
 \bigskip
@@ -74,6 +77,7 @@ Nakamoto solves brilliantly the aforementioned challenges in Bitcoin combining c
 
 \bigskip
 \subsection{Transactions and Blockchain Structure}
+\label{sec:transaction-blockchain}
 In Bitcoin, a coin or a \textit{bitcoin} is defined as a chain of digital signatures. Coins cannot be combined, subdivided or transferred, they can only be entirely consumed as transaction inputs (TxIn) in order to create new output coins (TxOut). Thus, a transaction output can only be in two states, \textit{spent} or \textit{unspent}. The set of current unspent coins takes the name of UTXO (Unspent Transaction Outputs). So, a \textit{transaction} assumes the role of the fundamental unit of state in the Bitcoin protocol.
 
 \bigskip
@@ -98,7 +102,7 @@ All the transactions, starting from the time the protocol was launched\footnote{
 The aforementioned \textit{tamper-evidence} property derives from cryptography, so we must introduce some primitives. But first a bit of history. The ideas behind the blockchain trace back to a paper by Haber and Stornetta in 1991 \cite{Haber91howto}. They proposed a method to \textit{timestamp} digital documents, that is a method to give an idea of when a document came into exixtance. To achieve this goal, a timestamping server receives client documents to timestamp. Then it signs the documents (one by one) together with the current time, and a special type of pointer that links to a piece of data instead of a location, pointing to the previous document. Thus, if some data is tampered, that pointer turns to be invalid. Finally the timestamping server issues a certificate containing such information. Therefore, it is clear that each document's certificate ensures the integrity of the previous document.
 
 \subsection{Hash Functions}
-\label{sub:hash}
+\label{sec:hash}
 The more the world becomes digital, the more we need information security. Cryptography mixes advanced mathematical and computer science techniques to provide confidentiality, data integrity, authentication and non-repudiation.
 
 \bigskip
@@ -176,7 +180,7 @@ The main takeaway of the result obtained in Equation \ref{eq:collision} is that 
 \end{myexample}
 
 \subsection{Mining \& Proof of Work}
-\label{par:pow}
+\label{sec:mining-pow}
 The Bitcoin blockchain is a public distributed ledger of transactions. Being public means that anyone should be allowed to add transactions to the blockchain. However, we already saw that in a peer-to-peer asynchronous network like this, some nodes are byzantine and could be malevolent, trying to perform doublespends, which can result in an inconsistent state since the validity of transactions depends on the order in which they arrive, not the same for all nodes. Thus, if doublespends are not resolved, the shared state diverges. Hence, we need a mechanism to resolve conflicting transactions, the so-called \textit{proof-of-work}\footnote{The idea of \textit{proof-of-work} is taken from Adam Back's Hashcash \cite{Back02hashcash-}, a scheme to combat email spam proposed in 1997.}, in order to append only valid blocks to the blockchain.
 
 \begin{mydef}{\bf (proof-of-work)}.
