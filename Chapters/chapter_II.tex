@@ -29,7 +29,7 @@ Therefore, the main reasons for using distributed systems are:
     \item Performance: Compared to other models, distributed models are expected to give a higher boost to performance.
     \item Fault Tolerance: A cluster of multiple machines is inherently more fault-tolerant than a single source of failure.
     \item Reliability: Data is replicated on different machines in order to prevent loss.
-    \item Availability: Data is replicated on different machines to minimize latency and provide faster access.
+    \item Availability: Sharing data on different machines minimize latency and provide faster access.
 \end{itemize}
 
 \bigskip
@@ -37,7 +37,7 @@ Therefore, the main reasons for using distributed systems are:
 However, beautiful features like these often have a downside, bringing to light some challenging problems:
 \begin{itemize}
     \item Security: Especially when networks are public.
-    \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or blockchain.}: In public distributed systems coordination problems are prevalent if proper protocols or policies are not in place; agents could be malevolent or malicious.
+    \item Coordination\footnote{In the fin-tech industry, coordination problems come with various names: consistency, agreement, consensus or blockchain.}: In public distributed systems coordination problems are prevalent if proper policies or protocols are not in place; there could be byzantine\footnote{As specified in Definition \ref{def:byzantine-node}.} agents.
 \end{itemize}
 Thus, it can be easily inferred that one of the main challenges of distributed systems is to achieve overall system reliability in the presence of a number of faulty processes. Examples of applications of consensus include whether to commit a transaction to a database, agreeing on the identity of a leader, state machine replication, clock synchronization, PageRank, load balancing and many others. Let us get in a detailed study of what consensus is and how consensus can be achieved in a distributed system.
 
