@@ -1,3 +1,11 @@
-\chapter{Practical Use Case}
+\chapter{Blockchain Notarization: A Practical Use Case}
 \label{chpr:project}
+This Chapter is aimed to be a technical report of a project in which the author, in partnership with DGI (Digital Gold Institute) and ANIA (Associazione Nazionale fra le Imprese Assicuratrici), worked during the draft of this thesis.
 
+\bigskip
+\section{Executive Summary}
+The purpose of this project work is to provide future clients a fully operating timestamping service, to enforce the notarization of digital documents which, as we already know, is traditionally achieved by certification authorities (CA), with a decentralized solution that is resilient even if the security of such CA is violated from the inside.
+
+\bigskip
+\noindent
+The timestamping service is implemented, with some extensions and modification on the basis of need, according to the \textit{OpenTimestamps} protocol, because of its high scalability and low maintenance cost, all nice features that we already saw in the description of such protocol in Section \ref{sec:ots}. In addition, the proposed solution is independent of any provider, being \textit{OpenTimestamps} an open-source project. It could be made available to customers for free or in form of a subscription service, with specific service level agreements, in order to provide additional features like the custody of any user's timestamp proof. For example, any insurance company could make use of this solution to grant authenticity of its associates' insurance policies or, more generally, whenever a digital signature is involved. We remind that \textit{OpenTimestamps} also provides all the guarantees for an independent audit: a user can verify the validity of its timestamp proof without the need of the calendar server which actually maintains the service up, just by querying a local Bitcoin node or a public block explorer. 
