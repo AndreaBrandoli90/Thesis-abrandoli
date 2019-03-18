@@ -8,21 +8,21 @@ The purpose of this project work is to provide future clients a fully operating 
 
 \bigskip
 \noindent
-The timestamping service is implemented, with some extensions and modification on the basis of need, according to the \textit{OpenTimestamps} protocol, because of its high scalability and low maintenance cost, all nice features that we already saw in the description of such protocol in Section \ref{sec:ots}. In addition, the proposed solution is independent of any provider, being \textit{OpenTimestamps} an open-source project. It could be made available to customers for free or in form of a subscription service, with specific service level agreements, in order to provide additional features like the custody of any user's timestamp proof. For example, any insurance company could make use of this solution to grant authenticity of its associates' insurance policies or, more generally, whenever a digital signature is involved. We remind that \textit{OpenTimestamps} also provides all the guarantees for an independent audit: a user can verify the validity of its timestamp proof without the need of the calendar server which actually maintains the service up, just by querying a local Bitcoin node or a public block explorer. Next we will move on the technical details regarding how this service is built, specifying when the \textit{OpenTimestamps} protocol is improved.
+The timestamping service is implemented, with some extensions and modification on the basis of need, according to the \textit{OpenTimestamps} protocol, because of its high scalability and low maintenance cost, all nice features that we already saw in the description of such protocol in Section \ref{sec:ots}. In addition, the proposed solution is independent of any provider, being \textit{OpenTimestamps} an open-source project. It could be made available to customers for free or in form of a subscription service, with specific service level agreements, in order to provide additional features like the custody of any user's timestamp proof, usually charged to the latter. For example, any insurance company could make use of this solution to grant authenticity of its associates' insurance policies or, more generally, whenever a digital signature is involved. We remind that \textit{OpenTimestamps} also provides all the guarantees for an independent audit: a user can verify the validity of its timestamp proof without the need of the calendar server which actually maintains the service up, just by querying a local Bitcoin node or a public block explorer. Next we will move on the technical details regarding how this service is built, specifying when the \textit{OpenTimestamps} protocol is improved.
 
 \bigskip
 \section{Architecture of the Solution}
-The architecture of the solution is composed by three servers (in cloud), accessible from outside via https thanks to network components.
+The architecture of the solution consists of three servers located in cloud, and accessible from the outside via network elements (DNS server, reverse proxy, firewall, etc.) able to transparently remap host names under the aniasafe.it domain on local IPs to the DMZ (demilitarized zone)\footnote{More precisely, a demilitarized zone is a physical or logical subnetwork that contains and exposes an organization's external-facing services to an untrusted network, usually a larger one like the Internet. All the details here: \url{https://en.wikipedia.org/wiki/DMZ_(computing)}.}.
 
 \bigskip
 \noindent
-A user can easily connect to the public web server via browser at \url{https://timestamp.aniasafe.it} and drag a document to timestamp\footnote{We remind that what is really timestamped is the \textit{hash value} of such document, automatically computed on user's local device, without harming privacy. We refer to Chapter \ref{chpr:notarization} for all the details.}. It is directly from browser (thanks to the underlying JavaScript code) that the timestamp request is sent to the calendar servers to be processed. The corresponding timestamp proof is automatically downloaded on the user's local device and can be verified on the same web page, simply dragging the \colorbox{light-gray}{.ots} file. In that specific case, the browser will query public block explorers\footnote{As specified in Section \ref{sec:ots-web}, timestamping services deployed as browser applications cannot query a local Bitcoin node and have to trust public block explorers.} in order to perform the verification procedure. 
+A user can easily connect to the public web server via browser at \url{https://timestamp.aniasafe.it} and upload a document to timestamp\footnote{We remind that what is really timestamped is the \textit{hash value} of such document, automatically computed on user's local device, without harming privacy. We refer to Chapter \ref{chpr:notarization} for all the details.}. It is directly from browser (thanks to the underlying JavaScript code) that the timestamp request is sent to the calendar servers to be processed. The corresponding timestamp proof is automatically downloaded on the user's local device and can be verified on the same web page, simply uploading the \colorbox{light-gray}{.ots} file. In that specific case, the browser will query public block explorers\footnote{As specified in Section \ref{sec:ots-web}, timestamping services deployed as browser applications cannot query a local Bitcoin node and have to trust public block explorers.} in order to perform the verification procedure. 
 
 \bigskip
 \noindent
 Before getting into technical details regarding the code that underlies this solution, we present two explanatory figures. On one hand, Figure \ref{fig:ots-project-stamping} is aimed to give an abstract idea of the whole timestamping process, on the other hand Figure \ref{fig:ots-project-verifying} refers to the verification procedure.
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
     \centering
 	\includegraphics[width=1\linewidth]{Images/project-stamping.jpg}
 	\caption{Architecture of the timestamping process}
@@ -30,7 +30,7 @@ Before getting into technical details regarding the code that underlies this sol
 \end{figure}
 
 \bigskip
-\begin{figure}[ht]
+\begin{figure}[!htb]
     \centering
 	\includegraphics[width=1\linewidth]{Images/project-verifying.jpg}
 	\caption{Architecture of the verification process}
@@ -40,3 +40,10 @@ Before getting into technical details regarding the code that underlies this sol
 \bigskip
 \section{Technical Details}
 The three servers introduced before are divided in a front-end server (\url{https://timestamp.aniasafe.it}) which hosts the public web page, and two back-end servers, the first one running a calendar server connected to a local\footnote{In the sense that the calendar server and the Bitcoin node run on the same machine.} Bitcoin node in mainnet mode (\url{https://calendar.aniasafe.it}), the latter connected to a local one in testnet mode (\url{https://test-calendar.aniasafe.it}).
+
+\subsection{Front-end Server}
+Il servizio di timestamping da pagina web funziona allo stesso modo di quello del sito ufficiale OpenTimestamps. Semplicemente facendo drag \& drop di un documento / prova esso viene timestampato o verificato, con tanto di upgrade automatico in caso il timestamp sia incompleto. Tuttavia, sono stati apportati 3 principali cambiamenti (metti la nota :  proposti ai manutentori di ots come pull request su github, in procinto di essere da loro accettate).  
+
+
+
+L'aspetto prettamente grafico della pagina web fa riferimento al repository "opentimestamps.org" in cui è presente uno script html collegato ad un file javascript per definirne il funzionamento. Tutto il protocollo viene definito nella libreria javascript-opentimestamps.
