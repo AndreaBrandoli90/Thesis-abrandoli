@@ -4,12 +4,12 @@ This appendix is aimed at providing a technical walkthrough the Bitcoin network 
 
 \bigskip
 \section{Running a Bitcoin Core node}
-To get started with Bitcoin, you first need to join the network running a node. Following these simple steps will make the first experience a lot easier.
+To get started with Bitcoin, you first need to join the network running a node. Following these simple steps\footnote{The presented guide is a simplified version of a very detailed open-source guide by C. Allen \cite{LearningBitcoinFromTheCommandLine}, conceived for a local installation of Bitcoin Core.} will make the first experience a lot easier.
 \begin{itemize}
 \item Setup variables (for an easy installation):
 \bigskip
 \begin{lstlisting}
- $ export BITCOIN=bitcoin-core-0.17.0
+ $ export BITCOIN=bitcoin-core-0.17.1
 \end{lstlisting}
 \item Download relevant files (Remark: every time you find username replace it with your personal one):
 \bigskip
@@ -61,7 +61,7 @@ Then create the configuration file (as you need it):
  testnet=1
  EOF
 \end{lstlisting}
-The \textit{bitcoin.conf} file is the default file which Bitcoin daemon reads when launched, and it contains instructions to configure the node (e.g. mainnet, testnet or regtest mode). In this example we define a \textit{rpcuser} and \textit{rpcpassword} to enable RPC, and we tell the node to synchronize with the Bitcoin Testnet chain. (metti una nota qui per il sito dei conf file).
+The \textit{bitcoin.conf} file is the default file which Bitcoin daemon reads when launched, and it contains instructions to configure the node (e.g. mainnet, testnet or regtest mode). In this example we define a \textit{rpcuser} and \textit{rpcpassword} to enable RPC, and we tell the node to synchronize with the Bitcoin Testnet chain.
 
 \bigskip
 \noindent
@@ -85,7 +85,7 @@ In this section we will answer the following question: \enquote{\textit{What is 
 
 \bigskip
 \noindent
-Without further going into details regarding computer science\footnote{For more details, see \url{https://en.wikipedia.org/wiki/Remote\_procedure\_call}.}, a RPC (Remote Procedure Call) is a powerful technique for constructing distributed, client-server based applications. It is based on the extension of the conventional procedure calling, so that the called procedure need not exist in the same address space as the calling procedure. The two processes may be on the same system, or they may be on different systems with a network connecting them. Our interest is for the \colorbox{Grey!10}{bitcoin-cli}, a handy interface that lets the user send commands to the \colorbox{Grey!10}{bitcoind}. More specifically, it lets you send RPC commands to the \colorbox{Grey!10}{bitcoind}. Generally, the \colorbox{Grey!10}{bitcoin-cli} interface is much more clean and user friendly than trying to send RPC commands by hand, using \colorbox{Grey!10}{curl} or some other method.
+Without further going into details regarding computer science, a RPC\footnote{For more details, see \url{https://en.wikipedia.org/wiki/Remote\_procedure\_call}.} (Remote Procedure Call) is a powerful technique for constructing distributed, client-server based applications. It is based on the extension of the conventional procedure calling, so that the called procedure need not exist in the same address space as the calling procedure. The two processes may be on the same system, or they may be on different systems with a network connecting them. Our interest is for the \colorbox{Grey!10}{bitcoin-cli}, a handy interface that lets the user send commands to the \colorbox{Grey!10}{bitcoind}. More specifically, it lets you send RPC commands to the \colorbox{Grey!10}{bitcoind}. Generally, the \colorbox{Grey!10}{bitcoin-cli} interface is much more clean and user friendly than trying to send RPC commands by hand, using \colorbox{Grey!10}{curl} or some other method.
 
 \bigskip
 \noindent

@@ -20,7 +20,7 @@ A user can easily connect to the public web server via browser at \url{https://t
 
 \bigskip
 \noindent
-Before getting into technical details regarding the code that underlies this solution, we present two explanatory figures. On one hand, Figure \ref{fig:ots-project-stamping} is aimed to give an abstract idea of the whole timestamping process, on the other hand Figure \ref{fig:ots-project-verifying} refers to the verification procedure.
+Before getting into technical details regarding the code base that underlies this solution, we present two explanatory figures. On one hand, Figure \ref{fig:ots-project-stamping} is aimed to give an abstract idea of the whole timestamping process, on the other hand Figure \ref{fig:ots-project-verifying} refers to the verification procedure.
 
 \begin{figure}[!htb]
     \centering
@@ -41,9 +41,42 @@ Before getting into technical details regarding the code that underlies this sol
 \section{Technical Details}
 The three servers introduced before are divided in a front-end server (\url{https://timestamp.aniasafe.it}) which hosts the public web page, and two back-end servers, the first one running a calendar server connected to a local\footnote{In the sense that the calendar server and the Bitcoin node run on the same machine.} Bitcoin node in mainnet mode (\url{https://calendar.aniasafe.it}), the latter connected to a local one in testnet mode (\url{https://test-calendar.aniasafe.it}).
 
-\subsection{Front-end Server}
-Il servizio di timestamping da pagina web funziona allo stesso modo di quello del sito ufficiale OpenTimestamps. Semplicemente facendo drag \& drop di un documento / prova esso viene timestampato o verificato, con tanto di upgrade automatico in caso il timestamp sia incompleto. Tuttavia, sono stati apportati 3 principali cambiamenti (metti la nota :  proposti ai manutentori di ots come pull request su github, in procinto di essere da loro accettate).  
+\bigskip
+\noindent
+As we already know, the whole timestamping service is implemented according to the open-source \textit{OpenTimestamps} protocol. For a better understanding we will separate the client side from the server one, clarifying their functioning.
+
+\bigskip
+\subsection{Client Side}
+The core of the client side is the underlying JavaScript library \cite{LibraryRepositoryGitHub}, which defines the main functions invoked when a user interacts with the web interface hosted by the front-end server: \textit{stamp}, \textit{verifyTimestamp} and \textit{upgrade}.
+
+\begin{itemize}
+    \item \textit{stamp}: it takes two parameters in input: \textit{detaches} that is the array of detached files to stamp and \textit{options}, which specifies the calendars to send a timestamp request. First, the function makes the parsing of input parameters to check if they are in the right format. Then it invokes \textit{makeMerkleTree} that, as the name suggests, builds a merkle tree of such files and passes the root of that tree to \textit{createTimestamp}, a function that composes a timestamp and submits it to the list of calendars specified on the options parameter.
+    \item \textit{verifyTimestamp}: it takes two parameters in input too: a \colorbox{light-gray}{.ots} file (the proof to be verified) and \textit{options} which, for any queried chain (f.e. Bitcoin mainnet, Bitcoin testnet, Litecoin etc.), specifies a list of block explorers and their types in order to fully manage the corresponding API\footnote{An Application Programming Interface (API) is a set of subroutine definitions, communication protocols, and tools for building software. In general terms, it is a set of clearly defined methods of communication among various components. More details here: \url{https://en.wikipedia.org/wiki/Application_programming_interface}.} in the right way. The function parses the file in input and, for any attestation found, it verifies the status of such attestation calling \textit{verifyAttestation}. If the attestation is in \textit{Pending} or \textit{Unknown} status, a warning message will notify that such attestation is incomplete or not recognized, in the sense that the tag relative to the chain used to stamp is not known. Otherwise, if the attestation is considered valid, first the function tries to reach a local node if present\footnote{We remind that verifying with a local node is always the best practice, having not to trust any third party.}, else the verification proceeds with the help of one or more block explorers. After a check of the chain in which the file is attested, it will be created an object named \textit{liteOptions} which extracts from the input parameter \textit{options} only the piece relative to the chain in question. Finally this new object is passed to the function \textit{liteVerify}\textup{\footnote{Lite or \enquote{light} because it verifies one attestaion at a time.}}, which generates an instance of the class \textit{ExplorerList}, that is a list of block explorers such function will interact to, in accordance to the ones specified in \textit{liteOptions}. These block explorers will query the blockchain with two calls, the first asking for the relative block hash, the latter, using that hash value as input, retrieves all the information of the block needed for the verification process.
+\end{itemize}
 
 
+\bigskip
+\subsection{Server Side}
 
-L'aspetto prettamente grafico della pagina web fa riferimento al repository "opentimestamps.org" in cui è presente uno script html collegato ad un file javascript per definirne il funzionamento. Tutto il protocollo viene definito nella libreria javascript-opentimestamps.
+\subsection{Extensions to the protocol}
+The front-end server hosts the web interface. Here, the usage of the timestamp service is almost identical to the one deployed in the official web page. You can drag \& drop a document to timestamp or a \colorbox{light-gray}{.ots} file to upgrade if the timestamp is incomplete, or to verify if complete. The only modification actually visible to the eye is that the original file is no more required to start the verification process. You can check if the timestamped hash matches the original in a separate box. This allows to delegate the verification process to any third party without harming privacy, just distributing the \colorbox{light-gray}{.ots} file, which contains no information about the content of the original document. If necessary, the owner of the original document will prove the veracity of such document by showing its hash value.
+
+\bigskip
+\noindent
+ A simplified example of the options format could be:
+    \begin{lstlisting}
+     const options = {
+       bitcoin: {
+         explorers: [
+           {url: 'https://blockstream.info/api', type: 'blockstream'},
+           {url: 'https://blockexplorer.com/api', type: 'insight'}
+         ]
+       },
+       litecoin: {
+         explorers: [
+           {url: 'https://ltc-bitcore1.trezor.io/api', type: 'insight'},
+           {url: 'https://insight.litecore.io/api', type: 'insight'}
+         ]
+       }
+     }
+    \end{lstlisting}
