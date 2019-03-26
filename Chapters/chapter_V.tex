@@ -61,12 +61,78 @@ The core of the client side is the underlying JavaScript library \cite{LibraryRe
 \bigskip
 \subsection{Server Side}
 \label{sec:server-side}
-The two back-end servers are part of the server side. They both run a calendar server connected to a local full node Bitcoin, one in mainnet mode\footnote{Mainnet is a shortcut used to indicate the main Bitcoin chain, where bitcoins have real value.}, the other in testnet mode\footnote{Like mainnet, testnet stands for the test chain, where bitcoins have no real value.}. How to run a full node Bitcoin is not of interest here, thus we remind to Appendix \ref{app:A} for a step-by-step tutorial. Instead we will focus on how to set up a calendar server, running it as a service, not just an installed program.
+The two back-end servers are part of the server side. They both run a calendar server connected to a local full node Bitcoin, one in mainnet mode\footnote{Mainnet is a shortcut used to indicate the main Bitcoin chain, where bitcoins have real value.}, the other in testnet mode\footnote{Like mainnet, testnet stands for the test chain, where bitcoins have no real value.}. How to run a full node Bitcoin is not of interest here, thus we remind to Appendix \ref{app:A} for a step-by-step tutorial. Instead we will focus on how to set up a calendar server, running it as a service, not just an installed program. From now on we suppose a Unix-based operative system\footnote{In particular we refer to Ubuntu Server 18.04 LTS.}, a common choice for servers.
+
+\bigskip
+\noindent
+First we have to clone locally the official Git repository \textit{opentimestamps-server} \cite{OpenTimestampsGithub}:
+\begin{lstlisting}
+ $ git clone https://github.com/opentimestamps/opentimestamps-server
+\end{lstlisting}
+
+\bigskip
+\noindent
+Then we have to install all the necessary requirements:
+\begin{lstlisting}
+ $ cd opentimestamps-server
+ $ pip3 install -r requirements.txt
+\end{lstlisting}
+
+\bigskip
+\noindent
+After that we can create the calendar's directory, specifying the URL of the web interface:
+\begin{lstlisting}
+ $ mkdir -p ~/.otsd/calendar/
+ $ echo "https://timestamp.aniasafe.it" > ~/.otsd/calendar/uri
+ $ dd if=/dev/random of=~/.otsd/calendar/hmac-key bs=32 count=1
+\end{lstlisting}
+
+\bigskip
+\noindent
+By now you can run the calendar server with a simple command:
+\begin{lstlisting}
+ $ ./otsd
+\end{lstlisting}
+
+\bigskip
+\noindent
+However, for production usage it is highly recommended to configure the calendar as a service, with a dedicated user:
+\begin{lstlisting}
+ $ sudo adduser --disabled-login --gecos 'User for Calendar server' ots
+ $ sudo su - ots
+\end{lstlisting}
+
+\bigskip
+\noindent
+The reference repository comes with some systemd scripts to manage \textit{otsd}\textup{\footnote{A shortcut for opentimestamps-server-daemon.}}. Hence we need to copy them in the local system directory:
+\begin{lstlisting}
+ $ sudo cp contrib/systemd/otsd.service /lib/systemd/system/otsd.service
+ $ sudo cp ots/opentimestamps-server/contrib/systemd/bitcoind-ready.sh /usr/local/bin/
+\end{lstlisting}
+
+\bigskip
+\noindent
+Finally, we are able to run the calendar as a service:
+\begin{lstlisting}
+ $ sudo systemctl enable otsd.service
+ $ sudo systemctl start otsd.service
+\end{lstlisting}
+
+\bigskip
+\noindent
+The calendar server is developed only in Python language and refers to the Python version of the \textit{OpenTimestamps} protocol's library. The code base we used which implements the calendar is almost identical to the original one. The only modification we did to the reference library is to introduce a new attestation class in \textit{notary.py}\textup{\footnote{That is the Python script in which are defined all the attestation classes (Bitcoin, Litecoin, Ethereum etc.).}}, named \textit{BitcoinTestnetBlockHeaderAttestation} to define Bitcoin testnet as an alternative chain, thus allowing a user to timestamp on both chains, without getting confused. In addition we modified the calendar's code base to recognize that new attestation class as a valid one. In Figure \ref{fig:backend} we can see a piece of a running calendar's log file.
+
+\begin{figure}[h!]
+    \centering
+	\includegraphics[width=1\linewidth]{Images/backend.png}
+	\caption{An example of a running calendar server}
+	\label{fig:backend}
+\end{figure}
 
 \bigskip
 \subsection{Extensions to the protocol}
 \label{sec:extensions}
-A small extension to the \textit{OpenTimestamps} protocol regards the web interface. Here, the usage of the timestamp service is almost identical to the one deployed in the official web page. You can drag \& drop a document to timestamp or a \colorbox{light-gray}{.ots} file to upgrade if the timestamp is incomplete, or to verify if complete. The only modification actually visible to the eye is that the original file is no more required to start the verification process. You can check if the timestamped hash matches the original in a separate box. This allows to delegate the verification process to any third party without harming privacy, just distributing the \colorbox{light-gray}{.ots} file, which contains no information about the content of the original document. If necessary, the owner of the original document will prove the veracity of such document by showing its hash value.
+A first small extension to the \textit{OpenTimestamps} protocol regards the web interface. Here, the usage of the timestamp service is almost identical to the one deployed in the official web page. You can drag \& drop a document to timestamp or a \colorbox{light-gray}{.ots} file to upgrade if the timestamp is incomplete, or to verify if complete. The only modification actually visible to the eye is that the original file is no more required to start the verification process. You can check if the timestamped hash matches the original in a separate box. This allows to delegate the verification process to any third party without harming privacy, just distributing the \colorbox{light-gray}{.ots} file, which contains no information about the content of the original document. If necessary, the owner of the original document will prove the veracity of such document by showing its hash value.
 
 \bigskip
 \noindent
@@ -91,4 +157,19 @@ Obviously, this is not the end of the story. Most of the proposed extensions are
 
 \bigskip
 \noindent
-Another important modification of the original protocol regards the verification process and we defined it \textit{multivalidation}. 
+Another important modification regards the verification process and we defined it \textit{multi-validation}. The original protocol supports timestamping on multiple chains, but the verification of one attestation at a time. This is due to the fact that in the \textit{options} parameter passed to the \textit{verify} function in the original underlying JavaScript library, a user can specify only one chain on which to check for a completed attestation. Now, thanks to the new options format which allows to specify multiple chains simultaneously, for any attestation found a cicle will verify it on the chain specified in such \textit{options} parameter. In Figure \ref{fig:multivalidation} we can see an example of multi-validation, in which a file is timestamped on the Bitcoin mainnet and testnet chains, with the help of the two calendar servers we set up before.
+
+\begin{figure}[ht]
+    \centering
+	\includegraphics[width=1\linewidth]{Images/multivalidation.png}
+	\caption{An example of multi-validation}
+	\label{fig:multivalidation}
+\end{figure}
+
+\bigskip
+\noindent
+In addition, a clever reader will already have noticed that another improvement is the definition of the Bitcoin testnet chain as an alternative chain. Obviously it raises conflicting opinions on the validity of a notarization made on a blockchain with an underlying asset (testnet coins) having no real value. However it could be seen as a useful tool to test the whole timestamping procedure without any cost, especially if the Bitcoin protocol evolves in some way.
+
+\bigskip
+\noindent
+Finally, at the path \url{https://timestamp.aniasafe.it/tools/} a service web interface is present in addition to the main one. It is designed to offer useful features during development and testing: through this interface, it is possible to decompose the hashing, timestamping, upgrade and receipt verification process into individual successive steps, which are instead masked to the user on the main page. It refers to an open-source project called \textit{javascript-opentimestamps-tools} by Luca Vaccaro \cite{OTStools}, which has been extended similarly as we did with the main \textit{OpenTimestamps} project.
