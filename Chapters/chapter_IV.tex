@@ -13,7 +13,7 @@ Traditionally, the notarization process is achieved by certification authorities
 
 \bigskip
 \noindent
-However, a central authority represents a single point of failure. Who maintains that ledger could act maliciously and easily tamper some data for his own interest. Hence the need to decentralize the source of trust and grant the reliability of that ledger even if the security of the aforementioned central authority breaks from the inside. A careful reader will have already figured out that the blockchain is the technology that perfectly fits our interest, assuring tamper-resistance and non-repudiation of data written in the chain. Among them, permissionless (public) blockchain is more preferred, because a service built on top of a permissioned (private) blockchain represents a single point of failure, as for a central authority. So, it results that the Bitcoin blockchain is the right answer\footnote{Regarding this, Italian law recognizes the validity of blockchain notarization and AGID will have to specify technical detail. \\ More info here: \url{https://www.agendadigitale.eu/documenti/blockchain-nel-ddl-semplificazioni-conseguenze-e-problemi-dellattuale-testo/}}. Unfortunately, at least for now, it cannot replace all the notary services, but it is perfect to give \textit{proof-of-existance} of a document, a procedure usually called \textit{timestamping}.
+However, a central authority represents a single point of failure. Who maintains that ledger could act maliciously and easily tamper some data for his own interest. Hence the need to decentralize the source of trust and grant the reliability of that ledger even if the security of the aforementioned central authority breaks from the inside. A careful reader will have already figured out that the blockchain is the technology that perfectly fits our interest, assuring tamper-resistance and non-repudiation of data written in the chain. Among them, permissionless (public) blockchain is more preferred, because a service built on top of a permissioned (private) blockchain represents a single point of failure, as for a central authority. So, it results that the Bitcoin blockchain is the right answer\footnote{Regarding this, Italian law recognizes the validity of blockchain notarization and AGID will have to specify technical detail. \\ More info here: \url{https://www.agendadigitale.eu/documenti/blockchain-nel-ddl-semplificazioni-conseguenze-e-problemi-dellattuale-testo/}.}. Unfortunately, at least for now, it cannot replace all the notary services, but it is perfect to give \textit{proof-of-existance} of a document, a procedure usually called \textit{timestamping}.
 
 \bigskip
 \section{Blockchain Timestamping}
@@ -35,7 +35,7 @@ can be publicly observed. So a proof consists in the data $d$, the set of operat
 
 \bigskip
 \noindent
-Recalling Definition \ref{def:hash-prop}, requiring a function to be a \textit{commitment} operation is the same to require that function to fulfill \textit{second-preimage resistance}, a property already seen in Paragraph \ref{sec:hash} for hash functions. We will now provide some simple examples of commitment operations in order to understand better, the \enquote{\textit{append}} and \enquote{\textit{prepend}} operations.
+Recalling Definition \ref{def:hash-prop}, requiring a function to be a \textit{commitment} operation is the same to require that function to fulfill \textit{second-preimage resistance}, a property already seen in Paragraph \ref{sec:hash} for hash functions. We will now provide some simple examples of commitment operations in order to understand better, the \enquote{\textit{append}} and \enquote{\textit{prepend}} operations:
 \begin{myexample}{\bf (\enquote{append})}.
     \textquotedblleft hello\textquotedblright $\xrightarrow{\text{append(\textquotedblleft world\textquotedblright)}}$ \textquotedblleft helloworld\textquotedblright.
 \end{myexample}
@@ -85,9 +85,9 @@ The simple way to fix in mind such a structure is by a figure. Antonopoulos in h
 \begin{figure}[ht]
     \centering
 	\includegraphics[width=0.9\linewidth]{Images/merkle-tree.png}
-	\caption{An example of a merkle tree of transactions}
+	\caption{An example of a merkle tree of transactions.}
 	\label{fig:merkle}
-	\source{\url{https://github.com/bitcoinbook/bitcoinbook/blob/develop/images/mbc2_0902.png}}
+	\source{\url{https://github.com/bitcoinbook/bitcoinbook/blob/develop/images/mbc2_0902.png}.}
 \end{figure}
 
 \bigskip
@@ -120,7 +120,7 @@ As we mentioned before, \textit{OpenTimestamps} proposes a solution to the scala
 	\includegraphics[width=0.9\linewidth]{Images/bitcoin-chain-calendar.png}
 	\caption{Scalability solution with \textit{OpenTimestamps}.}
 	\label{fig:scalability}
-	\source{\cite{Comandini:Thesis:2018}}
+	\source{\cite{Comandini:Thesis:2018}.}
 \end{figure}
 
 \bigskip
@@ -278,7 +278,7 @@ Rather than the more complicated client, the easiest way to perform a timestamp 
 \begin{figure}[htbp]
     \centering
 	\includegraphics[width=1\linewidth]{Images/stamping.png}
-	\caption{Stamping}
+	\caption{Stamping.}
 	\label{fig:ots-stamping}
 \end{figure}
 
@@ -290,7 +290,7 @@ Alternatively, you can drop a \colorbox{light-gray}{.ots} file to \textit{verify
 \begin{figure}[htbp]
     \centering
 	\includegraphics[width=1\linewidth]{Images/verify.png}
-	\caption{Verifying}
+	\caption{Verifying.}
 	\label{fig:ots-verifying}
 \end{figure}
 
