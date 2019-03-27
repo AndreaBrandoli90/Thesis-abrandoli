@@ -138,17 +138,17 @@ A hash function that fulfills the preimage resistance property \textit{hides} th
 \bigskip
 \noindent
 The correct approach to solve this problem is to compute the probability of two people \textit{not} having the same birthday:
-$$P(\text{2 people not colliding}) = \left(1-\frac{1}{365} \right)$$
+$$P(\text{2 people not colliding}) = \left(1-\frac{1}{365} \right).$$
 If a third person is joining:
-$$P(\text{3 people not colliding}) = \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right)$$
+$$P(\text{3 people not colliding}) = \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right).$$
 Hence, the probability for $t$ people having no birthday collision is given by:
-$$P(\text{$t$ people not colliding}) = \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right) \dotsm \left(1-\frac{t-1}{365} \right)$$
+$$P(\text{$t$ people not colliding}) = \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right) \dotsm \left(1-\frac{t-1}{365} \right).$$
 Then, making some simple calculations, it turns out that it only requires 23 people to have a probability of about 0.5 for a birthday collision:
 \begin{equation*}
 \begin{split}
     P(\text{at least one collision}) &= 1 - P(\text{no collision}) \\
             &= \left(1-\frac{1}{365} \right) \cdot \left(1-\frac{2}{365} \right) \dotsm \left(1-\frac{23-1}{365} \right) \\
-            &= 0.507 \approx 50 \%
+            &= 0.507 \approx 50 \%.
 \end{split}
 \end{equation*}
 The search of a collision for a hash function is exactly the same problem as the birthday problem, obviously with different parameters. Again, let $n$ be the output length in bits, thus resulting in $2^{n}$ possible output values. Here, the probability of no collisions among $t$ hash values is:
@@ -157,15 +157,15 @@ The search of a collision for a hash function is exactly the same problem as the
     P(\text{no collision}) &= \left(1-\frac{1}{2^{n}} \right) \cdot \left(1-\frac{2}{2^{n}} \right) \dotsm \left(1-\frac{t-1}{2^{n}} \right) \\
             &= \prod\limits_{i=1}^{t-1} \left(1-\frac{i}{2^{n}} \right) \\
             &\approx \prod\limits_{i=1}^{t-1} e^{- \frac{i}{2^{n}}} \\
-            &\approx e^{- \frac{t(t-1)}{2\cdot 2^{n}}}
+            &\approx e^{- \frac{t(t-1)}{2\cdot 2^{n}}}.
 \end{split}
 \end{equation*}
 Remind that we want to find how many messages are required to find a collision. Let $\lambda$ be the probability of at least one collision:
-$$\lambda \approx 1 - e^{- \frac{t(t-1)}{2^{n+1}}}$$
+$$\lambda \approx 1 - e^{- \frac{t(t-1)}{2^{n+1}}}.$$
 Solving for $t$ and observing that, since in practice $t>>1$, it holds that $t^{2}\approx t(t-1)$ we obtain:
 \begin{equation}
     \label{eq:collision}
-    t\approx 2^{(n+1)/2} \sqrt{\ln{\left(\frac{1}{1-\lambda}\right)}}
+    t\approx 2^{(n+1)/2} \sqrt{\ln{\left(\frac{1}{1-\lambda}\right)}}.
 \end{equation}
 The main takeaway of the result obtained in Equation \ref{eq:collision} is that the number of messages needed to find a collision of hash values is proportional to the square root of the number of possible output values.
 
@@ -234,7 +234,7 @@ Taking advantage of the main steps of the Bitcoin network behaviour described in
     \begin{mydef}{\bf (Bitcoin proof-of-work)}.
         \label{def:btc-pow}
         The Bitcoin proof-of-work consists of finding a special number $x$ called nonce s.t. the double SHA256 of the candidate block header falls below a given threshold\textup{\footnote{More precisely, the difficulty $d$ is calculated as: $d=\frac{\text{difficulty\_1\_target}}{\text{current\_target}}$. Traditionally, the \textit{difficulty\_1\_target} represents a hash where the leading 32 bits are zero and the rest are one, known as \textit{pool difficulty}, or \textit{pdiff}. Thus, the threshold value appears as $\frac{2^{224}}{d}$ and not $\frac{2^{256}}{d}$. In addition, the mining threshold is adaptively adjusted every 2016 blocks to achieve an average goal of a block 10 minutes (i.e. every 2 weeks).}}:
-        $$F_{d}(c,x) \rightarrow \text{SHA256}(\text{SHA256}(\underbrace{... \| \text{prev\_block\_header\_hash} \| ... \| x}_{\text{Candidate Block Header}})) < \frac{2^{224}}{d}$$
+        $$F_{d}(c,x) \rightarrow \text{SHA256}(\text{SHA256}(\underbrace{... \| \text{prev\_block\_header\_hash} \| ... \| x}_{\text{Candidate Block Header}})) < \frac{2^{224}}{d}.$$
     \end{mydef}
     
     \item The miner who first finds such a nonce will broadcast his own candidate block to the network. If all the transactions in that block pass the validity check, it is appended to the miner's local copy of the blockchain. Other nodes express their acceptance of the block by working on creating a new block using the hash of the accepted block as the previous hash. However, this is not the end of the story. It is possible that two miners mine their respective candidate blocks almost at the same time and, due to connection lag, they broadcast their blocks before being aware one of the other. This situation leads to a chain \textit{fork}, that is two possible valid chains, at least for the moment. The solution to this type of problem is achieved by the \textit{proof-of-work consensus}, i.e., in favor of the chain which required the most computational work\footnote{That is, with the majority of the network total hash rate working on it.} to produce.
