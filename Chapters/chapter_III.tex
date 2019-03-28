@@ -1,6 +1,6 @@
 \chapter{Nakamoto Consensus in Bitcoin}
 \label{chpr:btc}
-Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his author Satoshi Nakamoto\footnote{The name Satoshi Nakamoto is the pseudonym adopted by the creator of Bitcoin. While his identity remains a mystery, some information is known. He registered the domain bitcoin.org in August 2008 and in October 2008 he publicly released the famous white paper. In the Bitcoin's early days he participated extensively in forums and mailing lists maintaining the souce code. During the next two years other contributors slowly taken over the project maintenance and he stopped communicating, leaving a veil of mystery.} \cite{nakamoto2012bitcoin}, it lacked a formalization of the protocol and of the guarantees it claimed to provide.
+Bitcoin is a distributed, decentralized, peer-to-peer electronic payment system based on cryptographic proof instead of trust, allowing transactions between two counterparts without the need for a trusted third party. However, in late 2008, when the white paper was published by his inventor Satoshi Nakamoto\footnote{The name Satoshi Nakamoto is the pseudonym adopted by the creator of Bitcoin. While his identity remains a mystery, some information is known. He registered the domain bitcoin.org in August 2008 and in October 2008 he publicly released the famous white paper. In the Bitcoin's early days he participated extensively in forums and mailing lists maintaining the souce code. During the next two years other contributors slowly taken over the project maintenance and he stopped communicating, leaving a veil of mystery.} \cite{nakamoto2012bitcoin}, it lacked a formalization of the protocol and of the guarantees it claimed to provide.
 
 \bigskip
 \noindent
@@ -49,7 +49,7 @@ Now that we have clear in mind the consensus problem from a computer science per
 \bigskip
 \section{Bitcoin Design}
 \label{sec:btc-design}
-We already defined Bitcoin as a distributed, decentralized, peer-to-peer electronic payment system, but we lacked about defining the underlying digital asset, i.e. \textit{bitcoin}, the challenges in building it, and also the fundamental bricks of the Bitcoin wall. Combining all these aspects is crucial to fully understand Nakamoto consensus.
+We already defined Bitcoin as a distributed, decentralized, peer-to-peer electronic payment system, but we lacked about defining the underlying digital asset, i.e. \textit{bitcoin}, the challenges in building it, and how the Bitcoin protocol is designed. Combining all these aspects is crucial to fully understand Nakamoto consensus.
 
 \bigskip
 \subsection{Constructing a Decentralized Digital Currency}
@@ -216,7 +216,7 @@ The clever intuition of Nakamoto in resolving doublespends is to incentivize net
 
 \bigskip
 \noindent
-Taking advantage of the main steps of the Bitcoin network behaviour described in Algorithm \ref{alg:btc-network}, we can proceed to define the mining procedure as a workflow:
+Taking advantage of the main steps of the Bitcoin network behaviour described in Algorithm \ref{alg:btc-network}, we can proceed to define the mining procedure as a sequence of steps:
 
 \begin{enumerate}
     \item People performing bitcoin transactions will broadcast them onto the network. Such transactions will held in the \textit{mempool} (memory pool), that is a collection of pending transactions, before being included in a block. Each node of the network operate its own mempool, with its own unique size (typically MB).
@@ -243,4 +243,4 @@ Taking advantage of the main steps of the Bitcoin network behaviour described in
 
 \bigskip
 \noindent
-We set the basis for the very hearth of this thesis work, that is \textit{notarization} of digital documents with the Bitcoin blockchain. In Chapter \ref{chpr:notarization} we will study what a \textit{timestamp} on the blockchain is, introducing \textit{OpenTimestamps}, an open-source project whose aim is to be a standard for blockchain notarization. Then, in Chapter \ref{chpr:project} we will delve into the details of a project in which the author, in cooperation with DGI (Digital Gold Institute) and ANIA (Associazione Nazionale fra le Imprese Assicuratrici), built a fully operating timestamping service, modifying and extending the \textit{OpenTimestamps} protocol on the basis of need.
+We set the basis for the very hearth of this thesis work, that is \textit{notarization} of digital documents with the Bitcoin blockchain. In Chapter \ref{chpr:notarization} we will study what a \textit{timestamp} on the blockchain is, introducing \textit{OpenTimestamps}, an open-source project whose aim is to be a standard for blockchain notarization. Then, in Chapter \ref{chpr:project} we will delve into the details of a project in which the author, in cooperation with DGI (Digital Gold Institute) and ANIA (Associazione Nazionale fra le Imprese Assicuratrici), built a fully operating timestamping service, modifying and extending the \textit{OpenTimestamps} protocol.
