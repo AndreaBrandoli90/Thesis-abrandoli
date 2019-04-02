@@ -1,7 +1,25 @@
 \chapter{Introduction}
 \label{chpr:intro}
+The first use of a blockchain technology came in 2008 with the advent of Bitcoin, a phenomenon that many people today consider a revolution. Although this technology can apply to many areas, it is a widespread mistake to think that blockchain is the panacea for all kinds of problems.
 
+\bigskip
+\noindent
+Notarization of digital documents is always considered one of the use cases that blockchain technologies can provide or even disrupt. In real life, notarization is relevant to law. It is traditionally achieved by a notary public, that is a trusted authority. As a single entity, a notary public could be malevolent, tampering some data in the notarization process.
+Hence the need to strengthen such process with a technology built upon a distributed and decentralized system, which is resilient even if the integrity of the notary public breaks. By its nature the blockchain assures tamper-resistance of data written in the chain. In particular the Bitcoin blockchain, as the most reliable one, can replace one of the steps of a notarization process, that is a procedure called timestamping.
 
+\bigskip
+\noindent
+Timestamping a digital document means proving that such document existed prior to a certain time $t$ and in a certain state. A digital fingerprint is associated to the document, resulting in a unique 32 bytes string. Then, it is written in the Bitcoin blockchain with the help of a specific feature, called OP\_RETURN, which makes a transaction provably unspendable, paying just a small transaction fee to the miner who includes that transaction in a block of the chain.
+
+\bigskip
+\noindent
+Many of the first attempts of blockchain notarization were inefficient, requiring a Bitcoin transaction for any document, and lacking of a standardization. \textit{OpenTimestamps} is an open-source protocol that aims to be a standard for timestamping, consisting in a set of operations for creating provable blockchain timestamps that can be independently verified. It also solves the scalability problem, linking hash values in a binary tree structure and writing in the blockchain only the root of that tree.
+
+\bigskip
+\noindent
+The present thesis has been written during the author's fellowship at the Digital Gold Institute \cite{DGI}, a research and development center about scarcity in the digital realm. In partnership with ANIA (Associazione Nazionale fra le Imprese Assicuratrici), the author contributed in the development of a fully operating timestamping service, improving and extending \textit{OpenTimestamps} with additional features, as described in Chapter \ref{chpr:project}.
+
+\bigskip
 \section{Thesis Structure}
 In Chapter \ref{chpr:consensus} we will start presenting the consensus problem in distributed systems: first we will define what a distributed system is and the main reasons in adopting it (Section \ref{sec:distributed-systems}). Then we will get into the consensus problem (Section \ref{sec:consensus-problem}), in particular in the case of an asynchronous network in presence of byzantine (malicious) nodes (Sections \ref{sec:byzantine-generals} and \ref{sec:byzantine-agreement}), also showing a famous impossibility result (Section \ref{sec:impossibility-result}) in that specific case.
 
