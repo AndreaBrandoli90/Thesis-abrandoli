@@ -56,13 +56,12 @@ are mutually exclusive, as are correct and faulty. However, a node can be both h
 
 \bigskip
 \noindent
-We assume that each pair of nodes is connected by a link, which is a bi-directional reliable virtual circuit
-and therefore messages sent on this link are delivered, eventually, and in the order in which they were sent
-(i.e., a sender keeps re-transmitting a message until it receives an acknowledgment or crashes). A receiver can tell who sent a message, thus a message cannot be forged. Standing the above consideration, a message sent by a byzantine node is indistinguishable from a message sent by an honest node.
+We assume that each pair of nodes is connected by a bi-directional reliable virtual link.
+All the messages sent on this link are delivered, eventually, and in the order in which they were sent\footnote{More precisely, a sender keeps re-transmitting a message until it receives an acknowledgment or crashes}. A receiver can tell who sent a message, thus a message cannot be forged. Standing the above consideration, a message sent by a byzantine node is indistinguishable from a message sent by an honest node.
 
 \bigskip
 \noindent
-In the consensus problem nodes run \textit{actors}, that are either \textit{proposers}, each of which proposes a \textit{proposal}, or \textit{deciders}, each of which \textit{decides} one of the proposals. Assuming there exists at least one correct proposer
+As specified in a detailed article about the building blocks of consensus by Song and others \cite{Song:2008:BBC:1785854.1785862}, in the consensus problem nodes run \textit{actors}, that are either \textit{proposers}, each of which proposes a \textit{proposal}, or \textit{deciders}, each of which \textit{decides} one of the proposals. Assuming there exists at least one correct proposer
 (i.e., a proposer on a correct node), the goal of a consensus protocol is to ensure each correct decider decides
 the same proposal, even in the face of faulty proposers. A node may run both a proposer and a decider, in
 practice a proposer often would like to learn the outcome of the agreement.
